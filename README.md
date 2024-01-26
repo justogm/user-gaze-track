@@ -56,7 +56,7 @@ Puede ser modificado de acuerdo a las variables que se consideren relevantes.
 ![Presentación del prototipo](assets/readme/prototipo-figma.png)
 
 ## TODO
-- [] Evaluar comportamiento del modulo en caso de tener el prototipo en pantalla completa.
-- [] Analizar alternativas para la presentación del prototipo.
-- [] Facilitar el cambio del prototipo, no dejarlo hardcodeado.
-- [] Desarrollar una app paralela para el acceso a los datos generados y su manipulación.
+- [ ] Evaluar comportamiento del modulo en caso de tener el prototipo en pantalla completa.
+- [ ] Analizar alternativas para la presentación del prototipo.
+- [ ] Facilitar el cambio del prototipo, no dejarlo hardcodeado.
+- [ ] Desarrollar una app paralela para el acceso a los datos generados y su manipulación.
