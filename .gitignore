@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+
+.Python
+pip-selfcheck.json
+
+venv/
+Scripts/
+
+venv/
+bin/
+
+# Ignorar certificados
+cert.pem
+key.pem

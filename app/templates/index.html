@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <title>Formulario</title>
+</head>
+<body>
+    <div class="container">
+        <form method="post">
+            <fieldset>
+                <legend class="text-center fs-2">Información Personal</legend>
+                <div class="mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" name="nombre" class="form-control" id="nombre" placeholder="Ingresa tu nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input type="text" name="apellido" class="form-control" id="apellido" placeholder="Ingresa tu apellido" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edad" class="form-label">Edad</label>
+                    <input type="number" name="edad" class="form-control" id="edad" placeholder="Ingresa tu edad" required>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>
