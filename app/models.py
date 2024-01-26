@@ -7,6 +7,7 @@ class Sujeto(db.Model):
     nombre = db.Column(db.String(50), nullable=False)
     apellido = db.Column(db.String(50), nullable=False)
     edad = db.Column(db.Integer, nullable=False)
+    trayectoria_rel = db.relationship('Trayectoria', backref='sujeto', lazy=True, uselist=False)
 
 class Trayectoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +18,7 @@ class Punto(db.Model):
     x = db.Column(db.Float, nullable=False)
     y = db.Column(db.Float, nullable=False)
     trayectoria_id = db.Column(db.Integer, 
-                               db.ForeignKey('trajectory.id'), 
+                               db.ForeignKey('trayectoria.id'), 
                                nullable=False)
 
     def __str__(self):
