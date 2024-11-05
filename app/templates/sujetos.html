@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+    <title>Lista de Sujetos</title>
+</head>
+<body>
+	<div style="text-align: center;">
+		<h1>Lista de Sujetos</h1>
+		<table style="margin: 0 auto; border-collapse: collapse; width: 50%;", class="table table-hover">
+			<thead>
+				<tr>
+					<th scope="col", style="border: 1px solid black; padding: 8px;">ID</th>
+					<th scope="col", style="border: 1px solid black; padding: 8px;">Nombre</th>
+					<th scope="col", style="border: 1px solid black; padding: 8px;">Edad</th>
+					<th scope="col", style="border: 1px solid black; padding: 8px;">Resultados</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for sujeto in sujetos %}
+					<tr>
+						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.id }}</td>
+						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.nombre }} {{ sujeto.apellido }}</td>
+						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.edad }} años</td>
+						<td style="border: 1px solid black; padding: 8px;">
+							<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-link">Ver Resultados</a>
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
