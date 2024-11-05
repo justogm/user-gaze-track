@@ -16,3 +16,9 @@ class Punto(db.Model):
 
     def __str__(self):
         return f'Punto ({self.x}, {self.y})'
+
+    def __json__(self):
+        return {
+            'x': self.x,
+            'y': self.y
+    }
