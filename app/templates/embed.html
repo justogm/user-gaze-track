@@ -30,13 +30,26 @@
 
     <div height="100%" class="container">
         <!-- <iframe id="figma-prototype" width="100%" height="650" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FAp91mv3kmSM1xBvNzLzTw3%2FTest-B%3Ftype%3Ddesign%26node-id%3D8-1867%26t%3Deu6uWK3Bm709Thkk-1%26scaling%3Dmin-zoom%26page-id%3D0%253A1%26starting-point-node-id%3D8%253A1867%26mode%3Ddesign" allowfullscreen></iframe> -->
-        <img src="{{ url_for('static', filename='img/image.png') }}" alt="Imagen de ejemplo" width="100%" height="auto">
+        <img id="img_interes" src="" alt="Imagen de ejemplo" width="100%" height="auto">
     </div>
 
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       console.log(id);
+
+
+      // document.addEventListener('DOMContentLoaded', () => {
+        fetch('/config')
+            .then(response => response.json())
+            .then(config => {
+                const imgElement = document.getElementById('img_interes');
+                console.log(config.img_path);
+                imgElement.src = config.img_path;
+            })
+            .catch(error => console.error('Error al cargar el archivo config.json:', error));
+      // });
+
       function enviarPuntos(puntos) {
         fetch('/guardar-puntos', {
           method: 'POST',
@@ -61,6 +74,7 @@
           if (data == null) {
               return;
           }
+          webgazer.util.bound(data);
           var xprediction = data.x; // estas coordenadas x son relativas al viewport
           var yprediction = data.y; // estas coordenadas y son relativas al viewport
           console.log(xprediction, yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
