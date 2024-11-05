@@ -26,19 +26,34 @@
           </div>
         </div>
       </div>
-                
+
 
     <div height="100%" class="container">
-        <!-- <h2 class="center-text">¡Datos enviados con éxito!</h2>
-        <p class="center-text">Nombre: {{ nombre }}</p>
-        <p class="center-text">Apellido: {{ apellido }}</p>
-        <p class="center-text">Edad: {{ edad }}</p> -->
-
-        <!-- Aquí puedes insertar el iframe con el embed de Figma -->
-        <iframe id="figma-prototype" width="100%" height="650" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FAp91mv3kmSM1xBvNzLzTw3%2FTest-B%3Ftype%3Ddesign%26node-id%3D8-1867%26t%3Deu6uWK3Bm709Thkk-1%26scaling%3Dmin-zoom%26page-id%3D0%253A1%26starting-point-node-id%3D8%253A1867%26mode%3Ddesign" allowfullscreen></iframe>
+        <!-- <iframe id="figma-prototype" width="100%" height="650" src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FAp91mv3kmSM1xBvNzLzTw3%2FTest-B%3Ftype%3Ddesign%26node-id%3D8-1867%26t%3Deu6uWK3Bm709Thkk-1%26scaling%3Dmin-zoom%26page-id%3D0%253A1%26starting-point-node-id%3D8%253A1867%26mode%3Ddesign" allowfullscreen></iframe> -->
+        <img src="{{ url_for('static', filename='img/image.png') }}" alt="Imagen de ejemplo" width="100%" height="auto">
     </div>
 
     <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      console.log(id);
+      function enviarPuntos(puntos) {
+        fetch('/guardar-puntos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify( { puntos: puntos, id: parseInt(id, 10)} )
+        })
+        .then(response => response.text())
+        .then(result => {
+          console.log(result);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }
+
       let puntos = [];
 
       // Inicia WebGazer.js y establece el GazeListener
@@ -48,11 +63,19 @@
           }
           var xprediction = data.x; // estas coordenadas x son relativas al viewport
           var yprediction = data.y; // estas coordenadas y son relativas al viewport
-          console.log(xprediction, " ", yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
+          console.log(xprediction, yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
           puntos.push({ x: xprediction,
                         y: yprediction
                       })
+
+          if (puntos.length == 20) {
+            console.log("Enviando puntos...")
+            enviarPuntos(puntos);
+            puntos = [];
+          }
         }).begin();
+
+
     </script>
 
     <!-- Calibration points -->
