@@ -4,11 +4,61 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
+	<script src="https://unpkg.com/heatmap.js"></script>
 	<title>Resultados</title>
+	<style>
+		body, html {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+		.heatmap {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #f0f0f0; /* Color de fondo para mayor visibilidad */
+		}
+	</style>
 </head>
 <body>
-	<div style="text-align: center;">
-		ID: {{ sujeto.id}}
-	</div>
+	<div class="heatmap"></div>
+	<script type="text/javascript">
+		window.onload = function() {
+			// Convertir el arreglo de puntos de Python a un arreglo de JavaScript
+			var puntos = {{ puntos|tojson }};
+
+			console.log('Puntos', puntos);
+
+			// Ajusta las coordenadas
+			var puntos = puntos.map(punto => ({
+				x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
+				y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
+			}));
+			var data = {
+				max: 10, // Ajusta este valor para ver más intensidad
+				min: 0,
+				data: puntos.map(punto => ({
+					x: parseFloat(punto.x),
+					y: parseFloat(punto.y),
+					value: 5 // Puedes cambiarlo para diferentes intensidades
+				}))
+			};
+
+			// Comprobando los puntos
+			console.log('Puntos:', puntos);
+
+			// Configurando heatmap
+			console.log('Configurando heatmap con los siguientes datos:', data);
+			var heatmapInstance = h337.create({
+				container: document.querySelector('.heatmap')
+			});
+			heatmapInstance.setData(data);
+
+			heatmapInstance.repaint();
+		};
+	</script>
 </body>
 </html>
