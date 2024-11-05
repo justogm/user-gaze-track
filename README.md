@@ -33,6 +33,9 @@ Este comando realizará una serie de preguntas y finalmente creará los archivos
     ```bash
     python app.py
     ```
+## Importante
+> [!CAUTION]
+> Esta herramienta está en desarrollo y está pensada para entornos controlados, aún presenta severas vulnerabilidades para su distribución. Se recomienda no utilizarla en entornos de producción.
 
 ## Tecnologías relevantes
 - [Flask](https://flask.palletsprojects.com/en/3.0.x/)
