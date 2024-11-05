@@ -13,3 +13,5 @@ bin/
 # Ignorar certificados
 cert.pem
 key.pem
+
+*db
