@@ -21,13 +21,24 @@
 			left: 0;
 			background-color: #f0f0f0; /* Color de fondo para mayor visibilidad */
 		}
+
+		#btn-descarga {
+			position: absolute;
+			bottom: 50px;
+			right: 50px;
+		}
+
+		#img_interes {
+			width: 100%;
+			height: auto;
+		}
 	</style>
 </head>
 <body>
 	<div class="heatmap">
 		<img id="img_interes" src="" alt="Imagen de ejemplo" width="100%" height="auto">
 	</div>
-	<button id="btn-descarga" type="button" class="btn btn-primary" onclick="descargarArchivo()">Descargar</button>
+	<button id="btn-descarga" type="button" class="btn btn-outline-primary" onclick="descargarArchivo()">Descargar</button>
 	<script type="text/javascript">
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
