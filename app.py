@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory, send_file
 from app.models import db, Sujeto, Punto
 from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
 import os
 import csv
 import io
@@ -14,8 +15,34 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+swagger = Swagger(app)
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """
+    Página principal que permite el registro de un nuevo sujeto para la medición de su \
+        mirada.
+    ---
+    parameters:
+      - name: nombre
+        in: formData
+        type: string
+        required: true
+        description: Nombre del sujeto.
+      - name: apellido
+        in: formData
+        type: string
+        required: true
+        description: Apellido del sujeto.
+      - name: edad
+        in: formData
+        type: integer
+        required: true
+        description: Edad del sujeto.
+    responses:
+      200:
+        description: Página de inicio o redirección a la página de seguimiento.
+    """
     if request.method == 'POST':
         nombre = request.form['nombre']
         apellido = request.form['apellido']
@@ -30,6 +57,19 @@ def index():
 
 @app.route('/gaze-tracking')
 def embed():
+    """
+    Muestra la página de seguimiento ocular para el usuario con el id que se pasa como parámetro.
+    ---
+    parameters:
+      - name: id
+        in: query
+        type: integer
+        required: true
+        description: ID del sujeto para seguimiento ocular.
+    responses:
+      200:
+        description: Página de seguimiento ocular.
+    """
     return render_template('embed.html', id=request.args.get('id'))
 
 
