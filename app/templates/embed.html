@@ -38,17 +38,15 @@
       const id = urlParams.get('id');
       console.log(id);
 
+      fetch('/config')
+          .then(response => response.json())
+          .then(config => {
+              const imgElement = document.getElementById('img_interes');
+              console.log(config.img_path);
+              imgElement.src = config.img_path;
+          })
+          .catch(error => console.error('Error al cargar el archivo config.json:', error));
 
-      // document.addEventListener('DOMContentLoaded', () => {
-        fetch('/config')
-            .then(response => response.json())
-            .then(config => {
-                const imgElement = document.getElementById('img_interes');
-                console.log(config.img_path);
-                imgElement.src = config.img_path;
-            })
-            .catch(error => console.error('Error al cargar el archivo config.json:', error));
-      // });
 
       function enviarPuntos(puntos) {
         fetch('/guardar-puntos', {
@@ -75,18 +73,22 @@
               return;
           }
           webgazer.util.bound(data);
-          var xprediction = data.x; // estas coordenadas x son relativas al viewport
-          var yprediction = data.y; // estas coordenadas y son relativas al viewport
-          console.log(xprediction, yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
-          puntos.push({ x: xprediction,
-                        y: yprediction
-                      })
 
-          if (puntos.length == 20) {
-            console.log("Enviando puntos...")
-            enviarPuntos(puntos);
-            puntos = [];
+          if (isCalibrated()) {
+            var xprediction = data.x; // estas coordenadas x son relativas al viewport
+            var yprediction = data.y; // estas coordenadas y son relativas al viewport
+            console.log(xprediction, yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
+            puntos.push({ x: xprediction,
+                          y: yprediction
+                        })
+
+            if (puntos.length == 20) {
+              console.log("Enviando puntos...")
+              enviarPuntos(puntos);
+              puntos = [];
+            }
           }
+
         }).begin();
 
 

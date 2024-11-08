@@ -38,6 +38,9 @@ function ShowCalibrationPoint() {
     document.getElementById('Pt5').style.setProperty('display', 'none');
   }
 
+
+var calibrated = false;
+
 function calPointClick(node) {
     const id = node.id;
 
@@ -66,7 +69,10 @@ function calPointClick(node) {
         document.querySelectorAll('.Calibration').forEach((i) => {
             i.style.setProperty('display', 'none');
         });
-        
+
+        calibrated = true;
+
+
         showPrototype();
     }
 };
@@ -130,5 +136,10 @@ function Restart(){
     webgazer.clearData();
     ClearCalibration();
     PopUpInstruction();
+}
+
+
+function isCalibrated(){
+    return calibrated;
 }
 
