@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory, send_file
 from app.models import db, Sujeto, Punto
 from flask_sqlalchemy import SQLAlchemy
 import os
+import csv
+import io
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -63,6 +65,35 @@ def guardar_puntos():
 @app.route('/config')
 def config():
     return send_from_directory('config', 'config.json')
+
+
+@app.route('/descargar-puntos')
+def descargar_puntos():
+    sujeto_id = request.args.get('id')
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        puntos = Punto.query.filter_by(sujeto_id=sujeto.id).all()
+        puntos_dict = [punto.__json__() for punto in puntos]
+
+        si = io.StringIO()
+        escritor_csv = csv.DictWriter(si, fieldnames=puntos_dict[0].keys())
+        escritor_csv.writeheader()  # escribe los encabezados
+        escritor_csv.writerows(puntos_dict)  # escribe los datos
+
+        si.seek(0)
+
+        si_bytes = io.BytesIO(si.getvalue().encode('utf-8')) #Tiene que estar en este formato para send_file
+
+        return send_file(
+            si_bytes,
+            as_attachment=True,
+            download_name=f"puntos_sujeto_{sujeto_id}.csv",
+            mimetype='text/csv'
+        )
+
+    return "Sujeto no encontrado", 404
 
 if __name__ == '__main__':
     with app.app_context():
