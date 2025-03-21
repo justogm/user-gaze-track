@@ -147,16 +147,45 @@ function isCalibrated() {
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
 
-fetch("/config")
-  .then((response) => response.json())
-  .then((config) => {
-    const imgElement = document.getElementById("img_interes");
-    console.log(config.img_path);
-    imgElement.src = config.img_path;
-  })
-  .catch((error) =>
-    console.error("Error al cargar el archivo config.json:", error)
-  );
+document.addEventListener("DOMContentLoaded", function () {
+  // Obtener la configuración desde la ruta /config
+  fetch("/config")
+    .then((response) => response.json())
+    .then((config) => {
+      const prototypeUrl = config.prototype_url;
+      const imgPath = config.img_path;
+
+      // Validar que uno de los dos esté configurado y no ambos
+      if (
+        (!prototypeUrl || prototypeUrl === "null") &&
+        (!imgPath || imgPath === "null")
+      ) {
+        console.error(
+          "Error: Ambos valores son nulos. Debe configurarse 'prototype_url' o 'img_path'."
+        );
+        alert(
+          "Error: No se ha configurado correctamente el prototipo o la imagen."
+        );
+        return;
+      }
+
+      if (prototypeUrl && prototypeUrl !== "null") {
+        // Mostrar el iframe del prototipo
+        console.log(prototypeUrl)
+        const iframe = document.getElementById("prototype");
+        iframe.src = prototypeUrl;
+        iframe.style.display = "block";
+      } else if (imgPath && imgPath !== "null") {
+        // Mostrar la imagen
+        const imgElement = document.getElementById("img_interes");
+        imgElement.src = imgPath;
+        imgElement.style.display = "block";
+      }
+    })
+    .catch((error) =>
+      console.error("Error al cargar la configuración desde /config:", error)
+    );
+});
 
 function enviarPuntos(puntos) {
   fetch("/guardar-puntos", {
