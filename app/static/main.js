@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var yprediction = data.y; // Coordenadas y relativas al viewport
 
       // Add the current timestamp to each point
-      const currentTimestamp = new Date().toISOString();
+      const currentTimestamp = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
 
       points.push({
         fecha: currentTimestamp, // Add the timestamp here
