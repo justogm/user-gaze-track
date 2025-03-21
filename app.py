@@ -191,7 +191,7 @@ def guardar_puntos():
     puntos = data["puntos"]
 
     for punto in puntos:
-        fecha = datetime.fromisoformat(punto["fecha"])
+        fecha = datetime.strptime(punto["fecha"], "%m/%d/%Y, %I:%M:%S %p")
         punto_gaze = Punto(
             x=punto["gaze"]["x"],
             y=punto["gaze"]["y"],
