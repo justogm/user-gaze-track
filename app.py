@@ -332,4 +332,8 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True, ssl_context=("cert.pem", "key.pem"), port=5001)
+    with open("config/config.json", "r") as config_file:
+        config_data = json.load(config_file)
+    port = config_data.get("PORT", 5001)
+
+    app.run(debug=True, ssl_context=("cert.pem", "key.pem"), port=port)
