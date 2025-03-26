@@ -1,4 +1,5 @@
 {
 	"img_path": "null",
-	"prototype_url": "http://lica.ingenieria.uner.edu.ar:1880/dashboard/home"
+	"prototype_url": "https://usinalactea.ingenieria.uner.edu.ar/",
+	"port": "null"
 }
