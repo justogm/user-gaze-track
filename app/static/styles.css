@@ -71,8 +71,71 @@ body, html {
     width: 100%;
     height: 100%;
     border: none;
-  }
+    z-index: 1;
+}
 
-  .iframe-container {
+.iframe-container {
     height: 100%;
-  }
+}
+
+/* Barra desplegable */
+#task-bar {
+    display: none; /* Oculta la barra inicialmente */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30%;
+    background-color: #f8f9fa;
+    z-index: 1050; /* Asegura que esté por encima del iframe */
+    padding: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón flotante */
+#toggle-bar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050; /* Asegura que esté por encima del iframe */
+}
+
+/* Ocultar el botón flotante cuando la barra está visible */
+#task-bar.visible ~ #toggle-bar {
+    display: none;
+}
+
+/* Estilos para la barra de tareas */
+#task-bar {
+    display: none; /* Oculta la barra inicialmente */
+}
+
+#task-bar > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#task-bar-text {
+    margin: 0;
+    text-align: center;
+    font-size: 1.2em; /* Ajusta el tamaño según sea necesario */
+    color: black;
+    font-weight: bold;
+    width: 100%;
+}
+
+#task-bar > div:nth-child(2) {
+    margin-top: 10px;
+}
+
+#task-bar > div:nth-child(2) > button {
+    margin-right: 10px;
+}
+
+#task-bar-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Ajusta el espacio entre los botones */
+}

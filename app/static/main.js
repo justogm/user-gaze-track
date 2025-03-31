@@ -74,7 +74,7 @@ function calPointClick(node) {
 
     calibrated = true;
 
-    // showPrototype();
+    checkCalibrationAndShowButton();
   }
 }
 
@@ -146,6 +146,8 @@ function isCalibrated() {
  */
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
   // Obtener la configuración desde la ruta /config
@@ -259,4 +261,112 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .begin();
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Obtener las tareas desde la ruta /tasks
+  fetch("/tasks")
+    .then((response) => response.json())
+    .then((tasks) => {
+      // Guardar en un arreglo las tasks.tasks
+      tasksArray = tasks.tasks;
+
+      console.log(tasksArray);
+
+    })
+    .catch((error) =>
+      console.error("Error al cargar las tareas desde /tasks:", error)
+    );
+
+  // Botón para abrir la barra
+  document.getElementById("toggle-bar").addEventListener("click", function () {
+    document.getElementById("task-bar").style.display = "block";
+  });
+
+  // Botón para cerrar la barra
+  document.getElementById("close-bar").addEventListener("click", function () {
+    document.getElementById("task-bar").style.display = "none";
+  });
+
+  // Manejar el envío de la respuesta
+  document.getElementById("task-bar-submit").addEventListener("click", function () {
+    const userInput = document.getElementById("task-bar-input").value;
+    console.log(`Respuesta a "${tasksArray[currentTaskIndex]}": ${userInput}`);
+    currentTaskIndex++;
+    document.getElementById("task-bar-input").value = ""; // Limpiar el input
+    showNextTaskInBar(); // Mostrar la siguiente tarea
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Botón para abrir la barra
+    document.getElementById("toggle-bar").addEventListener("click", function () {
+        const taskBar = document.getElementById("task-bar");
+        taskBar.classList.add("visible");
+        taskBar.style.display = "block";
+
+        document.getElementById("toggle-bar").style.display = "none";
+    });
+
+    // Botón para cerrar la barra
+    document.getElementById("close-bar").addEventListener("click", function () {
+        const taskBar = document.getElementById("task-bar");
+        taskBar.classList.remove("visible");
+        taskBar.style.display = "none";
+
+        document.getElementById("toggle-bar").style.display = "block";
+    });
+});
+
+let tasksArray = []; // Inicializa como un arreglo vacío
+
+function showNextTaskInBar() {
+  const taskBarInput = document.getElementById("task-bar-input");
+
+  if (currentTaskIndex < tasksArray.length) {
+    const taskText = tasksArray[currentTaskIndex].task;
+    const taskType = tasksArray[currentTaskIndex].type;
+
+    document.getElementById("task-bar-text").innerText = taskText;
+
+    if (taskType === "bool") {
+      taskBarInput.style.display = "none"; // Oculta el input
+    } else {
+      taskBarInput.style.display = "block"; // Muestra el input
+    }
+
+  } else {
+    console.log("No hay más tareas.");
+    document.getElementById("task-bar-text").innerText = "No hay más tareas.";
+  }
+}
+
+// TODO: Agregar logging del datetime en el que se meustra una nueva tarea, cuando se resuelve y cuál fue la respuesta. COnsiderar un .log y además un csv que sea tiempo inicio, tiempo fin, respuesta
+
+// function checkCalibrationAndShowButton() {
+//   if (calibrated) {;
+//       document.getElementById("toggle-bar").style.display = "block";
+//   }
+// }
+
+function checkCalibrationAndShowButton() {
+  if (calibrated) {
+      const toggleBar = document.getElementById("toggle-bar");
+      toggleBar.style.display = "block";
+
+      // Mostrar la primera tarea en la barra
+      if (tasksArray.length > 0) {
+          currentTaskIndex = 0; // Inicializar el índice de tareas
+          showNextTaskInBar(); // Mostrar la primera tarea
+      } else {
+          console.error("No hay tareas disponibles para mostrar.");
+      }
+  }
+}
+
+// Ocultar el botón de tarea inicialmente
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("toggle-bar").style.display = "none";
 });

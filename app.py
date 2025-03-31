@@ -229,6 +229,18 @@ def config():
     return send_from_directory("config", "config.json")
 
 
+@app.route("/tasks")
+def tasks():
+    """
+    Descarga el archivo de tareas.
+    ---
+    responses:
+        200:
+            description: Archivo de tareas.
+    """
+    return send_from_directory("config", "tasks.json")
+
+
 @app.route("/descargar-puntos")
 def descargar_puntos():
     """
