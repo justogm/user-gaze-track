@@ -1,0 +1,13 @@
+site_name: User Gaze Tracking documentation
+theme: readthedocs
+nav:
+  - Home: about.md
+  - Getting started:
+    - Installation: getting_started/installation.md
+  - Application:
+    - Overview: getting_started/overview.md
+    - Features:
+      - Home Page: getting_started/features/home.md
+      - Gaze Tracking: getting_started/features/gaze_tracking.md
+      - Subjects: getting_started/features/subjects.md
+      - Results: getting_started/features/results.md
