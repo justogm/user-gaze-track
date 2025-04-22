@@ -312,6 +312,14 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("task-bar-input").value = ""; // Limpiar el input
       showNextTaskInBar(); // Mostrar la siguiente tarea
     });
+
+  document.getElementById("skip-button").addEventListener("click", function () {
+    // Aquí puedes agregar la lógica para omitir la tarea actual
+    document.getElementById("task-bar-input").value = ""; // Limpiar el input
+    console.log("Tarea omitida");
+    currentTaskIndex++;
+    showNextTaskInBar(); // Mostrar la siguiente tarea
+  });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
