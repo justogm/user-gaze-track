@@ -6,7 +6,12 @@
 		"version": 1
 	  },
 	  {
-		"task": "Determinar salinidad del cremoso y humedad de la cámara 3.",
+		"task": "Determinar salinidad del cremoso",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar humedad de la cámara 3",
 		"type": "numeric",
 		"version": 1
 	  },
