@@ -93,32 +93,34 @@ function stop_storing_points_variable() {
   webgazer.params.storingPoints = false;
 }
 
+
 // -----------------------------
 window.onload = async function () {
   //start the webgazer tracker
   await webgazer
     .setRegression("ridge") /* currently must set regression and tracker */
-    .setTracker('clmtrackr')
+    .setTracker('TFFacemesh')
     .saveDataAcrossSessions(true)
     .begin();
   webgazer
-    .showVideoPreview(true) /* shows all video previews */
+    .showVideoPreview(false) /* shows all video previews */
     .showPredictionPoints(
-      true
+      false
     ) /* shows a square every 100 milliseconds where current prediction is */
     .applyKalmanFilter(
       true
-    ); /* Kalman Filter defaults to on. Can be toggled by user. */
+    )/* Kalman Filter defaults to on. Can be toggled by user. */
+    ;
 
   //Set up the webgazer video feedback.
-  var setup = function () {
-    //Set up the main canvas. The main canvas is used to calibrate the webgazer.
-    var canvas = document.getElementById("plotting_canvas");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    canvas.style.position = "fixed";
-  };
-  setup();
+  // var setup = function () {
+  //   //Set up the main canvas. The main canvas is used to calibrate the webgazer.
+  //   var canvas = document.getElementById("plotting_canvas");
+  //   canvas.width = window.innerWidth;
+  //   canvas.height = window.innerHeight;
+  //   canvas.style.position = "fixed";
+  // };
+  // setup();
 };
 
 // Set to true if you want to save the data even if you reload the page.
@@ -227,12 +229,25 @@ document.addEventListener("mousemove", (event) => {
 
 // Inicia WebGazer.js y establece el GazeListener
 document.addEventListener("DOMContentLoaded", function () {
+  const observer = new MutationObserver(() => {
+    const videos = document.querySelectorAll("#webgazerVideoContainer");
+    videos.forEach((video) => {
+      if (isCalibrated()) {
+        video.style.display = "none";
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
   webgazer
     .setGazeListener(function (data, elapsedTime) {
       if (data == null) {
         return;
       }
       webgazer.util.bound(data);
+
+      webgazer.showVideoPreview(false)
 
       if (isCalibrated()) {
         var xprediction = data.x; // Coordenadas x relativas al viewport
@@ -261,6 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .begin();
+
+
 });
 
 
