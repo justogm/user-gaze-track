@@ -276,6 +276,26 @@ document.addEventListener("DOMContentLoaded", function () {
     .begin();
 });
 
+function enviarTaskLogIndividual(taskLog) {
+  fetch("/guardar-tasklogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      taskLogs: [taskLog], // Enviar solo el log actual
+      sujeto_id: parseInt(id, 10), // ID del sujeto
+    }),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log("TaskLog enviado:", result);
+    })
+    .catch((error) => {
+      console.error("Error al enviar TaskLog:", error);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // Obtener las tareas desde la ruta /tasks
   fetch("/tasks")
@@ -311,6 +331,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       taskLogs[currentTaskIndex].response = userInput;
 
+      enviarTaskLogIndividual(taskLogs[currentTaskIndex]);
+
       console.log(
         `Respuesta a "${tasksArray[currentTaskIndex]}": ${userInput}`
       );
@@ -326,6 +348,8 @@ document.addEventListener("DOMContentLoaded", function () {
       timeZone: "America/Argentina/Buenos_Aires",
     });
     taskLogs[currentTaskIndex].response = "skipped"; // Opción de omitir
+
+    enviarTaskLogIndividual(taskLogs[currentTaskIndex]);
 
     document.getElementById("task-bar-input").value = ""; // Limpiar el input
     console.log("Tarea omitida");

@@ -50,3 +50,33 @@ class Punto(db.Model):
 
     def __json__(self):
         return {"x": self.x, "y": self.y}
+
+
+class TaskLog(db.Model):
+    """
+    Representa un registro de una tarea realizada por un sujeto.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=True)
+    response = db.Column(
+        db.String(255), nullable=True
+    )  # Puede ser NULL si se omitió la tarea
+    sujeto_id = db.Column(db.Integer, db.ForeignKey("sujeto.id"), nullable=False)
+
+    sujeto = db.relationship("Sujeto", backref=db.backref("task_logs", lazy=True))
+
+    def __str__(self):
+        return (
+            f"TaskLog {self.id} - Sujeto: {self.sujeto_id} - Inicio: {self.start_time}"
+        )
+
+    def __json__(self):
+        return {
+            "id": self.id,
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "response": self.response,
+            "sujeto_id": self.sujeto_id,
+        }

@@ -20,7 +20,7 @@ from flask import (
 import numpy as np
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
-from app.models import db, Sujeto, Punto, Medicion
+from app.models import db, Sujeto, Punto, Medicion, TaskLog
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -217,6 +217,55 @@ def guardar_puntos():
     return jsonify({"status": "success"})
 
 
+@app.route("/guardar-tasklogs", methods=["POST"])
+def guardar_tasklogs():
+    """
+    Guarda los registros de tareas (taskLogs) en la base de datos.
+    ---
+    parameters:
+        - name: taskLogs
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+                type: object
+                properties:
+                    start_time:
+                        type: string
+                        format: date-time
+                    end_time:
+                        type: string
+                        format: date-time
+                    response:
+                        type: string
+                    sujeto_id:
+                        type: integer
+    responses:
+        200:
+            description: TaskLogs guardados exitosamente.
+    """
+    data = request.get_json()
+    task_logs = data["taskLogs"]
+    sujeto_id = data["sujeto_id"]
+
+    for log in task_logs:
+        nuevo_log = TaskLog(
+            start_time=datetime.strptime(log["startTime"], "%m/%d/%Y, %I:%M:%S %p"),
+            end_time=(
+                datetime.strptime(log["endTime"], "%m/%d/%Y, %I:%M:%S %p")
+                if log["endTime"]
+                else None
+            ),
+            response=log["response"],
+            sujeto_id=sujeto_id,
+        )
+        db.session.add(nuevo_log)
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "TaskLogs guardados exitosamente."})
+
+
 @app.route("/config")
 def config():
     """
@@ -296,6 +345,40 @@ def descargar_puntos():
         )
 
     return "Sujeto no encontrado", 404
+
+
+@app.route("/descargar-tasks")
+def descargar_tasklogs():
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        si = io.StringIO()
+        escritor_csv = csv.writer(si)
+
+        # Escribir encabezados
+        escritor_csv.writerow(["start_time", "end_time", "response"])
+        # Obtener los task logs del sujeto
+        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto_id).all()
+        # Escribir filas
+        for log in task_logs:
+            fila = [
+                log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                log.end_time.strftime("%Y-%m-%d %H:%M:%S") if log.end_time else None,
+                log.response,
+            ]
+            escritor_csv.writerow(fila)
+        si.seek(0)
+        si_bytes = io.BytesIO(si.getvalue().encode("utf-8"))
+        return send_file(
+            si_bytes,
+            as_attachment=True,
+            download_name=f"tasklogs_sujeto_{sujeto_id}.csv",
+            mimetype="text/csv",
+        )
+    else:
+        return "Sujeto no encontrado", 404
 
 
 @app.route("/descargar-todos")
