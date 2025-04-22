@@ -305,6 +305,12 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("task-bar-submit")
     .addEventListener("click", function () {
       const userInput = document.getElementById("task-bar-input").value;
+
+      taskLogs[currentTaskIndex].endTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      taskLogs[currentTaskIndex].response = userInput;
+
       console.log(
         `Respuesta a "${tasksArray[currentTaskIndex]}": ${userInput}`
       );
@@ -315,12 +321,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("skip-button").addEventListener("click", function () {
     // Aquí puedes agregar la lógica para omitir la tarea actual
+
+    taskLogs[currentTaskIndex].endTime = new Date().toLocaleString("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires",
+    });
+    taskLogs[currentTaskIndex].response = "skipped"; // Opción de omitir
+
     document.getElementById("task-bar-input").value = ""; // Limpiar el input
     console.log("Tarea omitida");
     currentTaskIndex++;
     showNextTaskInBar(); // Mostrar la siguiente tarea
   });
 });
+
+let startTime = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   // Botón para abrir la barra
@@ -330,6 +344,17 @@ document.addEventListener("DOMContentLoaded", function () {
     taskBar.style.display = "block";
 
     document.getElementById("toggle-bar").style.display = "none";
+
+    if (!startTime) {
+      startTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      console.log("Tiempos de inicio:", startTime);
+    }
+
+    if (currentTaskIndex === 0 && tasksArray.length > 0) {
+      showNextTaskInBar();
+    }
   });
 
   // Botón para cerrar la barra
@@ -343,13 +368,27 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 let tasksArray = []; // Inicializa como un arreglo vacío
+let taskLogs = []; // Inicializa como un arreglo vacío
 
 function showNextTaskInBar() {
+  console.log(taskLogs);
   const taskBarInput = document.getElementById("task-bar-input");
 
   if (currentTaskIndex < tasksArray.length) {
     const taskText = tasksArray[currentTaskIndex].task;
     const taskType = tasksArray[currentTaskIndex].type;
+
+    // Registrar el tiempo de inicio de la tarea actual
+    taskLogs[currentTaskIndex] = {
+      startTime:
+        currentTaskIndex === 0
+          ? startTime // Usar el tiempo global si es la primera tarea
+          : new Date().toLocaleString("en-US", {
+              timeZone: "America/Argentina/Buenos_Aires",
+            }),
+      endTime: null,
+      response: null,
+    };
 
     document.getElementById("task-bar-text").innerText = taskText;
 
@@ -380,7 +419,6 @@ function checkCalibrationAndShowButton() {
     // Mostrar la primera tarea en la barra
     if (tasksArray.length > 0) {
       currentTaskIndex = 0; // Inicializar el índice de tareas
-      showNextTaskInBar(); // Mostrar la primera tarea
     } else {
       console.error("No hay tareas disponibles para mostrar.");
     }
