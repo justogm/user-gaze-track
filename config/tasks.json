@@ -36,6 +36,11 @@
 		"version": 1
 	  },
 	  {
+		"task": "Dirigete a la versión 2",
+		"type": "bool",
+		"version": 2
+	  },
+	  {
 		"task": "Configurar 3 lotes.",
 		"type": "bool",
 		"version": 2
