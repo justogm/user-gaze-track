@@ -425,16 +425,9 @@ function showNextTaskInBar() {
   } else {
     console.log("No hay más tareas.");
     document.getElementById("task-bar-text").innerText = "No hay más tareas.";
+    // TODO: Que se oculte el entry form y que se deje de medir.
   }
 }
-
-// TODO: Agregar logging del datetime en el que se meustra una nueva tarea, cuando se resuelve y cuál fue la respuesta. COnsiderar un .log y además un csv que sea tiempo inicio, tiempo fin, respuesta
-
-// function checkCalibrationAndShowButton() {
-//   if (calibrated) {;
-//       document.getElementById("toggle-bar").style.display = "block";
-//   }
-// }
 
 function checkCalibrationAndShowButton() {
   if (calibrated) {
