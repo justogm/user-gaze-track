@@ -236,7 +236,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       webgazer.showVideoPreview(false);
 
-      if (isCalibrated()) {
+      const taskBar = document.getElementById("task-bar");
+
+      if (isCalibrated() && taskBar.style.display !== "block") {
         var xprediction = data.x; // Coordenadas x relativas al viewport
         var yprediction = data.y; // Coordenadas y relativas al viewport
 
