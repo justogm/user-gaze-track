@@ -347,6 +347,92 @@ def descargar_puntos():
     return "Sujeto no encontrado", 404
 
 
+@app.route("/api/get-sujetos", methods=["GET"])
+def api_sujetos():
+    """
+    Devuelve información sobre los sujetos registrados.
+    ---
+    responses:
+        200:
+            description: JSON con la información de los sujetos.
+    """
+    sujetos = Sujeto.query.all()
+    sujetos_info = [
+        {
+            "id": sujeto.id,
+            "nombre": sujeto.nombre,
+            "apellido": sujeto.apellido,
+            "edad": sujeto.edad,
+        }
+        for sujeto in sujetos
+    ]
+    return jsonify(sujetos_info)
+
+
+@app.route("/api/get-user-points")
+def get_user_points():
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        # Obtener las mediciones del sujeto
+        mediciones = Medicion.query.filter_by(sujeto_id=sujeto.id).all()
+
+        # Construir una lista de puntos con los datos necesarios
+        puntos = []
+        for medicion in mediciones:
+            punto = {
+                "fecha": medicion.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+                "x_mouse": medicion.punto_mouse.x if medicion.punto_mouse else None,
+                "y_mouse": medicion.punto_mouse.y if medicion.punto_mouse else None,
+                "x_gaze": medicion.punto_gaze.x if medicion.punto_gaze else None,
+                "y_gaze": medicion.punto_gaze.y if medicion.punto_gaze else None,
+            }
+            puntos.append(punto)
+
+        return jsonify({"sujeto_id": sujeto_id, "puntos": puntos})
+    return "Sujeto no encontrado", 404
+
+
+@app.route("/api/get-user-tasklogs")
+def get_user_tasklogs():
+    """
+    Devuelve los task logs de un sujeto específico.
+    ---
+    parameters:
+        - name: id
+          in: query
+          type: integer
+          required: true
+          description: ID del sujeto para obtener los task logs.
+    responses:
+        200:
+            description: JSON con los task logs del sujeto.
+        404:
+            description: Sujeto no encontrado.
+    """
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        # Obtener los task logs del sujeto
+        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto.id).all()
+        task_logs_info = [
+            {
+                "start_time": log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "end_time": (
+                    log.end_time.strftime("%Y-%m-%d %H:%M:%S") if log.end_time else None
+                ),
+                "response": log.response,
+            }
+            for log in task_logs
+        ]
+        return jsonify({"sujeto_id": sujeto_id, "task_logs": task_logs_info})
+    return "Sujeto no encontrado", 404
+
+
 @app.route("/descargar-tasks")
 def descargar_tasklogs():
     sujeto_id = request.args.get("id", type=int)
