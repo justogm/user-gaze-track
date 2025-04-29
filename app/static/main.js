@@ -204,15 +204,6 @@ function enviarPuntos(puntos) {
     });
 }
 
-// // Obtener referencia al iframe
-// const iframe = document.getElementById("prototype");
-
-// // Función para enviar un punto (x, y)
-// function enviarPuntoIframe(x, y) {
-//   const punto = { x, y }; // Crear el objeto con las coordenadas
-//   iframe.contentWindow.postMessage(punto, "http://127.0.0.1:5500"); // Enviar el mensaje al iframe
-// }
-
 let points = [];
 let mouse_position = { x: 0, y: 0 }; // Define mouse_position as an object
 
@@ -364,10 +355,15 @@ document.addEventListener("DOMContentLoaded", function () {
   // Botón para abrir la barra
   document.getElementById("toggle-bar").addEventListener("click", function () {
     const taskBar = document.getElementById("task-bar");
+    const prototype = document.getElementById("prototype");
+
     taskBar.classList.add("visible");
     taskBar.style.display = "block";
 
     document.getElementById("toggle-bar").style.display = "none";
+
+    prototype.style.pointerEvents = "none";
+    prototype.style.filter = "blur(5px)";
 
     if (!startTime) {
       startTime = new Date().toLocaleString("en-US", {
@@ -384,10 +380,15 @@ document.addEventListener("DOMContentLoaded", function () {
   // Botón para cerrar la barra
   document.getElementById("close-bar").addEventListener("click", function () {
     const taskBar = document.getElementById("task-bar");
+    const prototype = document.getElementById("prototype");
+
     taskBar.classList.remove("visible");
     taskBar.style.display = "none";
 
     document.getElementById("toggle-bar").style.display = "block";
+
+    prototype.style.pointerEvents = "auto";
+    prototype.style.filter = "none";
   });
 });
 
