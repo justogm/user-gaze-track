@@ -94,6 +94,18 @@ def embed():
     return render_template("embed.html", id=request.args.get("id"))
 
 
+@app.route("/fin-medicion")
+def fin_medicion():
+    """
+    Muestra la página de finalización de la medición.
+    ---
+    responses:
+        200:
+            description: Página de finalización de la medición.
+    """
+    return render_template("fin.html")
+
+
 @app.route("/sujetos")
 def sujetos():
     """

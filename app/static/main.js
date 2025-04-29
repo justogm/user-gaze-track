@@ -423,9 +423,7 @@ function showNextTaskInBar() {
       taskBarInput.style.display = "block"; // Muestra el input
     }
   } else {
-    console.log("No hay más tareas.");
-    document.getElementById("task-bar-text").innerText = "No hay más tareas.";
-    // TODO: Que se oculte el entry form y que se deje de medir.
+    window.location.href = "/fin-medicion";
   }
 }
 
