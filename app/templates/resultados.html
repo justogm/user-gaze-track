@@ -38,13 +38,14 @@
   </head>
   <body>
     <div class="heatmap">
-      <img
-        id="img_interes"
-        src=""
-        alt="Imagen de ejemplo"
-        width="100%"
-        height="auto"
-      />
+      <div style="height: 100%; width: 100%">
+        <div class="iframe-container">
+          <iframe id="prototype" style="display: none"></iframe>
+        </div>
+        <div class="image-container">
+          <img id="img_interes" style="display: none" alt="Imagen de interés" />
+        </div>
+      </div>
     </div>
 
     <button
@@ -97,29 +98,57 @@
 
       // console.log('Puntos', puntos);
 
-      fetch('/config')
-      	.then(response => response.json())
-      	.then(config => {
-      		const imgElement = document.getElementById('img_interes');
-      		console.log(config.img_path);
-      		imgElement.src = config.img_path;
-      	})
-      	.catch(error => console.error('Error al cargar el archivo config.json:', error));
+      fetch("/config")
+      .then((response) => response.json())
+      .then((config) => {
+        const prototypeUrl = config.prototype_url;
+        const imgPath = config.img_path;
 
-      // Ajusta las coordenadas
-      var puntos = puntos.map(punto => ({
-      x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
-      y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
-      }));
-      var data = {
-      max: 10, // Ajusta este valor para ver más intensidad
-      min: 0,
-      data: puntos.map(punto => ({
-      	x: parseFloat(punto.x),
-      	y: parseFloat(punto.y),
-      	value: 5 // Puedes cambiarlo para diferentes intensidades
-      }))
-      };
+        // Validar que uno de los dos esté configurado y no ambos
+        if (
+          (!prototypeUrl || prototypeUrl === "null") &&
+          (!imgPath || imgPath === "null")
+        ) {
+          console.error(
+            "Error: Ambos valores son nulos. Debe configurarse 'prototype_url' o 'img_path'."
+          );
+          alert(
+            "Error: No se ha configurado correctamente el prototipo o la imagen."
+          );
+          return;
+        }
+
+        if (prototypeUrl && prototypeUrl !== "null") {
+          // Mostrar el iframe del prototipo
+          console.log(prototypeUrl);
+          const iframe = document.getElementById("prototype");
+          iframe.src = prototypeUrl;
+          iframe.style.display = "block";
+        } else if (imgPath && imgPath !== "null") {
+          // Mostrar la imagen
+          const imgElement = document.getElementById("img_interes");
+          imgElement.src = imgPath;
+          imgElement.style.display = "block";
+        }
+      })
+      .catch((error) =>
+        console.error("Error al cargar la configuración desde /config:", error)
+      );
+
+        // Ajusta las coordenadas
+        var puntos = puntos.map(punto => ({
+        x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
+        y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
+        }));
+        var data = {
+        max: 10, // Ajusta este valor para ver más intensidad
+        min: 0,
+        data: puntos.map(punto => ({
+          x: parseFloat(punto.x),
+          y: parseFloat(punto.y),
+          value: 5 // Puedes cambiarlo para diferentes intensidades
+        }))
+        };
 
       // Comprobando los puntos
       console.log('Puntos:', puntos);
