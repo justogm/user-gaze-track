@@ -18,17 +18,17 @@ api/
 ### routes.py
 Contains all API endpoint definitions using Flask blueprints. Routes are organized by functionality:
 
-- **Subject Management**: `/api/get-sujetos`
+- **Subject Management**: `/api/get-subjects`
 - **Data Retrieval**: `/api/get-user-points`, `/api/get-user-tasklogs`
-- **Data Storage**: `/api/guardar-puntos`, `/api/guardar-tasklogs`
-- **Data Export**: `/api/descargar-puntos`, `/api/descargar-tasklogs`, `/api/descargar-todos`
+- **Data Storage**: `/api/save-points`, `/api/save-tasklogs`
+- **Data Export**: `/api/download-points`, `/api/download-tasklogs`, `/api/download-all`
 - **Configuration**: `/api/config`, `/api/tasks`
 
 ### services.py
 Contains business logic organized into service classes:
 
-- **SujetoService**: Subject management operations
-- **MedicionService**: Measurement data processing
+- **SubjectService**: Subject management operations
+- **MeasurementService**: Measurement data processing
 - **TaskLogService**: Task logging operations
 - **ExportService**: Data export functionality
 
@@ -37,7 +37,7 @@ Centralized configuration for API settings, swagger documentation, and response 
 
 ## API Endpoints
 
-### GET /api/get-sujetos
+### GET /api/get-subjects
 Returns a list of all registered subjects.
 
 **Response:**
@@ -45,9 +45,9 @@ Returns a list of all registered subjects.
 [
   {
     "id": 1,
-    "nombre": "John",
-    "apellido": "Doe", 
-    "edad": 25
+    "name": "John",
+    "surname": "Doe", 
+    "age": 25
   }
 ]
 ```
@@ -61,10 +61,10 @@ Returns measurement points for a specific subject.
 **Response:**
 ```json
 {
-  "sujeto_id": 1,
-  "puntos": [
+  "subject_id": 1,
+  "points": [
     {
-      "fecha": "2023-01-01 12:00:00",
+      "date": "2023-01-01 12:00:00",
       "x_mouse": 100.5,
       "y_mouse": 200.3,
       "x_gaze": 105.2,
@@ -77,16 +77,16 @@ Returns measurement points for a specific subject.
 ### GET /api/get-user-tasklogs?id={subject_id}
 Returns task logs for a specific subject.
 
-### POST /api/guardar-puntos
+### POST /api/save-points
 Saves measurement points to the database.
 
 **Body:**
 ```json
 {
   "id": 1,
-  "puntos": [
+  "points": [
     {
-      "fecha": "1/1/2023, 12:00:00 PM",
+      "date": "1/1/2023, 12:00:00 PM",
       "gaze": {"x": 105.2, "y": 198.7},
       "mouse": {"x": 100.5, "y": 200.3}
     }
@@ -94,16 +94,16 @@ Saves measurement points to the database.
 }
 ```
 
-### POST /api/guardar-tasklogs
+### POST /api/save-tasklogs
 Saves task logs to the database.
 
-### GET /api/descargar-puntos?id={subject_id}
+### GET /api/download-points?id={subject_id}
 Downloads measurement points as CSV for a specific subject.
 
-### GET /api/descargar-tasklogs?id={subject_id}
+### GET /api/download-tasklogs?id={subject_id}
 Downloads task logs as CSV for a specific subject.
 
-### GET /api/descargar-todos
+### GET /api/download-all
 Downloads all measurement points as CSV for all subjects.
 
 ### GET /api/config

@@ -14,7 +14,7 @@ SWAGGER_CONFIG = {
     'tags': [
         {
             'name': 'subjects',
-            'description': 'Operations related to subjects (sujetos)'
+            'description': 'Operations related to subjects'
         },
         {
             'name': 'measurements', 
@@ -37,8 +37,8 @@ SWAGGER_CONFIG = {
 
 # Response messages
 API_RESPONSES = {
-    'SUBJECT_NOT_FOUND': 'Sujeto no encontrado',
-    'NO_SUBJECTS': 'No hay sujetos registrados',
+    'SUBJECT_NOT_FOUND': 'Subject not found',
+    'NO_SUBJECTS': 'No registered subjects',
     'SUCCESS': 'success',
-    'TASKLOGS_SAVED': 'TaskLogs guardados exitosamente.'
+    'TASKLOGS_SAVED': 'TaskLogs saved successfully.'
 }

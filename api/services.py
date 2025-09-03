@@ -10,86 +10,86 @@ import numpy as np
 from app.models import db, Sujeto, Punto, Medicion, TaskLog
 
 
-class SujetoService:
-    """Service class for managing subjects (sujetos)."""
+class SubjectService:
+    """Service class for managing subjects."""
     
     @staticmethod
-    def get_all_sujetos():
+    def get_all_subjects():
         """Get all subjects with their basic information."""
-        sujetos = Sujeto.query.all()
+        subjects = Sujeto.query.all()
         return [
             {
-                "id": sujeto.id,
-                "nombre": sujeto.nombre,
-                "apellido": sujeto.apellido,
-                "edad": sujeto.edad,
+                "id": subject.id,
+                "name": subject.nombre,
+                "surname": subject.apellido,
+                "age": subject.edad,
             }
-            for sujeto in sujetos
+            for subject in subjects
         ]
     
     @staticmethod
-    def get_sujeto_by_id(sujeto_id):
+    def get_subject_by_id(subject_id):
         """Get a subject by its ID."""
-        return Sujeto.query.filter_by(id=sujeto_id).first()
+        return Sujeto.query.filter_by(id=subject_id).first()
 
 
-class MedicionService:
-    """Service class for managing measurements (mediciones)."""
+class MeasurementService:
+    """Service class for managing measurements."""
     
     @staticmethod
-    def save_puntos(data):
+    def save_points(data):
         """Save measurement points to the database."""
-        puntos = data["puntos"]
-        sujeto_id = data["id"]
+        points = data["points"]
+        subject_id = data["id"]
 
-        for punto in puntos:
-            fecha = datetime.strptime(punto["fecha"], "%m/%d/%Y, %I:%M:%S %p")
+        for point in points:
+            date = datetime.strptime(point["date"], "%m/%d/%Y, %I:%M:%S %p")
             
-            punto_gaze = Punto(
-                x=punto["gaze"]["x"],
-                y=punto["gaze"]["y"],
+            gaze_point = Punto(
+                x=point["gaze"]["x"],
+                y=point["gaze"]["y"],
             )
-            db.session.add(punto_gaze)
+            db.session.add(gaze_point)
 
-            punto_mouse = Punto(
-                x=punto["mouse"]["x"],
-                y=punto["mouse"]["y"],
+            mouse_point = Punto(
+                x=point["mouse"]["x"],
+                y=point["mouse"]["y"],
             )
-            db.session.add(punto_mouse)
+            db.session.add(mouse_point)
 
-            nueva_medicion = Medicion(
-                fecha=fecha,
-                sujeto_id=sujeto_id,
-                punto_gaze=punto_gaze,
-                punto_mouse=punto_mouse,
+            new_measurement = Medicion(
+                fecha=date,
+                sujeto_id=subject_id,
+                punto_gaze=gaze_point,
+                punto_mouse=mouse_point,
             )
-            db.session.add(nueva_medicion)
+            db.session.add(new_measurement)
 
         db.session.commit()
         return {"status": "success"}
     
     @staticmethod
-    def get_user_points(sujeto_id):
+    def get_user_points(subject_id):
         """Get measurement points for a specific subject."""
-        sujeto = SujetoService.get_sujeto_by_id(sujeto_id)
+        subject = SubjectService.get_subject_by_id(subject_id)
         
-        if not sujeto:
+        if not subject:
             return None
         
-        mediciones = Medicion.query.filter_by(sujeto_id=sujeto.id).all()
+        measurements = Medicion.query.filter_by(sujeto_id=subject.id).all()
         
-        puntos = []
-        for medicion in mediciones:
-            punto = {
-                "fecha": medicion.fecha.strftime("%Y-%m-%d %H:%M:%S"),
-                "x_mouse": medicion.punto_mouse.x if medicion.punto_mouse else None,
-                "y_mouse": medicion.punto_mouse.y if medicion.punto_mouse else None,
-                "x_gaze": medicion.punto_gaze.x if medicion.punto_gaze else None,
-                "y_gaze": medicion.punto_gaze.y if medicion.punto_gaze else None,
+        points = []
+        for measurement in measurements:
+            point = {
+                "date": measurement.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+                "x_mouse": measurement.punto_mouse.x if measurement.punto_mouse else None,
+                "y_mouse": measurement.punto_mouse.y if measurement.punto_mouse else None,
+                "x_gaze": measurement.punto_gaze.x if measurement.punto_gaze else None,
+                "y_gaze": measurement.punto_gaze.y if measurement.punto_gaze else None,
             }
-            puntos.append(punto)
+            points.append(point)
 
-        return {"sujeto_id": sujeto_id, "puntos": puntos}
+        return {"subject_id": subject_id, "points": points}
 
 
 class TaskLogService:
@@ -99,10 +99,10 @@ class TaskLogService:
     def save_tasklogs(data):
         """Save task logs to the database."""
         task_logs = data["taskLogs"]
-        sujeto_id = data["sujeto_id"]
+        subject_id = data["subject_id"]
 
         for log in task_logs:
-            nuevo_log = TaskLog(
+            new_log = TaskLog(
                 start_time=datetime.strptime(log["startTime"], "%m/%d/%Y, %I:%M:%S %p"),
                 end_time=(
                     datetime.strptime(log["endTime"], "%m/%d/%Y, %I:%M:%S %p")
@@ -110,22 +110,22 @@ class TaskLogService:
                     else None
                 ),
                 response=log["response"],
-                sujeto_id=sujeto_id,
+                sujeto_id=subject_id,
             )
-            db.session.add(nuevo_log)
+            db.session.add(new_log)
 
         db.session.commit()
-        return {"status": "success", "message": "TaskLogs guardados exitosamente."}
+        return {"status": "success", "message": "TaskLogs saved successfully."}
     
     @staticmethod
-    def get_user_tasklogs(sujeto_id):
+    def get_user_tasklogs(subject_id):
         """Get task logs for a specific subject."""
-        sujeto = SujetoService.get_sujeto_by_id(sujeto_id)
+        subject = SubjectService.get_subject_by_id(subject_id)
         
-        if not sujeto:
+        if not subject:
             return None
         
-        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto.id).all()
+        task_logs = TaskLog.query.filter_by(sujeto_id=subject.id).all()
         task_logs_info = [
             {
                 "start_time": log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -136,93 +136,93 @@ class TaskLogService:
             }
             for log in task_logs
         ]
-        return {"sujeto_id": sujeto_id, "task_logs": task_logs_info}
+        return {"subject_id": subject_id, "task_logs": task_logs_info}
 
 
 class ExportService:
     """Service class for data export functionality."""
     
     @staticmethod
-    def export_puntos_csv(sujeto_id):
+    def export_points_csv(subject_id):
         """Export measurement points for a subject as CSV."""
-        sujeto = SujetoService.get_sujeto_by_id(sujeto_id)
+        subject = SubjectService.get_subject_by_id(subject_id)
         
-        if not sujeto:
+        if not subject:
             return None
         
-        mediciones = Medicion.query.filter_by(sujeto_id=sujeto.id).all()
+        measurements = Medicion.query.filter_by(sujeto_id=subject.id).all()
         
         si = io.StringIO()
-        escritor_csv = csv.writer(si)
+        csv_writer = csv.writer(si)
         
         # Write headers
-        escritor_csv.writerow(["fecha", "x_mouse", "y_mouse", "x_gaze", "y_gaze"])
+        csv_writer.writerow(["date", "x_mouse", "y_mouse", "x_gaze", "y_gaze"])
         
         # Write rows
-        for medicion in mediciones:
-            fila = [
-                medicion.fecha.strftime("%Y-%m-%d %H:%M:%S"),
-                medicion.punto_mouse.x if medicion.punto_mouse else None,
-                medicion.punto_mouse.y if medicion.punto_mouse else None,
-                medicion.punto_gaze.x if medicion.punto_gaze else None,
-                medicion.punto_gaze.y if medicion.punto_gaze else None,
+        for measurement in measurements:
+            row = [
+                measurement.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+                measurement.punto_mouse.x if measurement.punto_mouse else None,
+                measurement.punto_mouse.y if measurement.punto_mouse else None,
+                measurement.punto_gaze.x if measurement.punto_gaze else None,
+                measurement.punto_gaze.y if measurement.punto_gaze else None,
             ]
-            escritor_csv.writerow(fila)
+            csv_writer.writerow(row)
         
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))
     
     @staticmethod
-    def export_tasklogs_csv(sujeto_id):
+    def export_tasklogs_csv(subject_id):
         """Export task logs for a subject as CSV."""
-        sujeto = SujetoService.get_sujeto_by_id(sujeto_id)
+        subject = SubjectService.get_subject_by_id(subject_id)
         
-        if not sujeto:
+        if not subject:
             return None
         
         si = io.StringIO()
-        escritor_csv = csv.writer(si)
+        csv_writer = csv.writer(si)
         
         # Write headers
-        escritor_csv.writerow(["start_time", "end_time", "response"])
+        csv_writer.writerow(["start_time", "end_time", "response"])
         
         # Get task logs for the subject
-        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto_id).all()
+        task_logs = TaskLog.query.filter_by(sujeto_id=subject_id).all()
         
         # Write rows
         for log in task_logs:
-            fila = [
+            row = [
                 log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
                 log.end_time.strftime("%Y-%m-%d %H:%M:%S") if log.end_time else None,
                 log.response,
             ]
-            escritor_csv.writerow(fila)
+            csv_writer.writerow(row)
         
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))
     
     @staticmethod
-    def export_all_puntos_csv():
+    def export_all_points_csv():
         """Export measurement points for all subjects as CSV."""
-        all_sujetos = Sujeto.query.all()
+        all_subjects = Sujeto.query.all()
         
-        if len(all_sujetos) == 0:
+        if len(all_subjects) == 0:
             return None
         
         si = io.StringIO()
-        escritor_csv = csv.DictWriter(si, fieldnames=["id", "x", "y"])
-        escritor_csv.writeheader()
+        csv_writer = csv.DictWriter(si, fieldnames=["id", "x", "y"])
+        csv_writer.writeheader()
 
-        for sujeto in all_sujetos:
-            puntos = Punto.query.filter_by(sujeto_id=sujeto.id).all()
-            puntos_dict = [punto.__json__() for punto in puntos]
+        for subject in all_subjects:
+            points = Punto.query.filter_by(sujeto_id=subject.id).all()
+            points_dict = [point.__json__() for point in points]
 
-            id_sujeto = int(sujeto.id)
+            subject_id = int(subject.id)
 
-            puntos_np = np.array([[id_sujeto, p["x"], p["y"]] for p in puntos_dict])
+            points_np = np.array([[subject_id, p["x"], p["y"]] for p in points_dict])
 
-            for punto in puntos_np:
-                escritor_csv.writerow({"id": punto[0], "x": punto[1], "y": punto[2]})
+            for point in points_np:
+                csv_writer.writerow({"id": point[0], "x": point[1], "y": point[2]})
 
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))

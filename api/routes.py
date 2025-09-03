@@ -3,81 +3,81 @@ API routes for the user gaze tracking application.
 """
 
 from flask import Blueprint, request, jsonify, send_file, send_from_directory
-from .services import SujetoService, MedicionService, TaskLogService, ExportService
+from .services import SubjectService, MeasurementService, TaskLogService, ExportService
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
-@api_bp.route("/get-sujetos", methods=["GET"])
-def api_sujetos():
+@api_bp.route("/get-subjects", methods=["GET"])
+def api_subjects():
     """
-    Devuelve información sobre los sujetos registrados.
+    Returns information about registered subjects.
     ---
     responses:
         200:
-            description: JSON con la información de los sujetos.
+            description: JSON with subjects information.
     """
-    sujetos_info = SujetoService.get_all_sujetos()
-    return jsonify(sujetos_info)
+    subjects_info = SubjectService.get_all_subjects()
+    return jsonify(subjects_info)
 
 
 @api_bp.route("/get-user-points")
 def get_user_points():
     """
-    Devuelve los puntos de gaze y mouse de un sujeto específico.
+    Returns gaze and mouse points for a specific subject.
     ---
     parameters:
         - name: id
           in: query
           type: integer
           required: true
-          description: ID del sujeto para obtener los puntos.
+          description: Subject ID to get the points.
     responses:
         200:
-            description: JSON con los puntos del sujeto.
+            description: JSON with subject points.
         404:
-            description: Sujeto no encontrado.
+            description: Subject not found.
     """
-    sujeto_id = request.args.get("id", type=int)
+    subject_id = request.args.get("id", type=int)
     
-    result = MedicionService.get_user_points(sujeto_id)
+    result = MeasurementService.get_user_points(subject_id)
     if result:
         return jsonify(result)
-    return "Sujeto no encontrado", 404
+    return "Subject not found", 404
 
 
 @api_bp.route("/get-user-tasklogs")
 def get_user_tasklogs():
     """
-    Devuelve los task logs de un sujeto específico.
+    Returns task logs for a specific subject.
     ---
     parameters:
         - name: id
           in: query
           type: integer
           required: true
-          description: ID del sujeto para obtener los task logs.
+          description: Subject ID to get the task logs.
     responses:
         200:
-            description: JSON con los task logs del sujeto.
+            description: JSON with subject task logs.
         404:
-            description: Sujeto no encontrado.
+            description: Subject not found.
     """
-    sujeto_id = request.args.get("id", type=int)
+    subject_id = request.args.get("id", type=int)
     
-    result = TaskLogService.get_user_tasklogs(sujeto_id)
+    result = TaskLogService.get_user_tasklogs(subject_id)
     if result:
         return jsonify(result)
-    return "Sujeto no encontrado", 404
+    return "Subject not found", 404
 
 
-@api_bp.route("/guardar-puntos", methods=["POST"])
-def guardar_puntos():
+@api_bp.route("/save-points", methods=["POST"])
+def save_points():
     """
-    Guarda los puntos registrados en la base de datos.
+    Saves recorded points to the database.
     ---
     parameters:
-        - name: puntos
+        - name: points
           in: body
           required: true
           schema:
@@ -85,12 +85,12 @@ def guardar_puntos():
             properties:
                 id:
                     type: integer
-                puntos:
+                points:
                     type: array
                     items:
                         type: object
                         properties:
-                            fecha:
+                            date:
                                 type: string
                                 format: date-time
                             gaze:
@@ -112,14 +112,14 @@ def guardar_puntos():
             description: status success
     """
     data = request.get_json()
-    result = MedicionService.save_puntos(data)
+    result = MeasurementService.save_points(data)
     return jsonify(result)
 
 
-@api_bp.route("/guardar-tasklogs", methods=["POST"])
-def guardar_tasklogs():
+@api_bp.route("/save-tasklogs", methods=["POST"])
+def save_tasklogs():
     """
-    Guarda los registros de tareas (taskLogs) en la base de datos.
+    Saves task logs (taskLogs) to the database.
     ---
     parameters:
         - name: taskLogs
@@ -138,11 +138,11 @@ def guardar_tasklogs():
                         format: date-time
                     response:
                         type: string
-                    sujeto_id:
+                    subject_id:
                         type: integer
     responses:
         200:
-            description: TaskLogs guardados exitosamente.
+            description: TaskLogs saved successfully.
     """
     data = request.get_json()
     result = TaskLogService.save_tasklogs(data)
@@ -152,11 +152,11 @@ def guardar_tasklogs():
 @api_bp.route("/config")
 def config():
     """
-    Descarga el archivo de configuración.
+    Downloads the configuration file.
     ---
     responses:
         200:
-            description: Archivo de configuración.
+            description: Configuration file.
     """
     return send_from_directory("config", "config.json")
 
@@ -164,95 +164,95 @@ def config():
 @api_bp.route("/tasks")
 def tasks():
     """
-    Descarga el archivo de tareas.
+    Downloads the tasks file.
     ---
     responses:
         200:
-            description: Archivo de tareas.
+            description: Tasks file.
     """
     return send_from_directory("config", "tasks.json")
 
 
-@api_bp.route("/descargar-puntos")
-def descargar_puntos():
+@api_bp.route("/download-points")
+def download_points():
     """
-    Descarga los puntos registrados para un sujeto en particular.
+    Downloads recorded points for a specific subject.
     ---
     parameters:
         - name: id
           in: query
           type: integer
           required: true
-          description: ID del sujeto para descargar los puntos.
+          description: Subject ID to download points.
     responses:
         200:
-            description: Archivo CSV con los puntos registrados.
+            description: CSV file with recorded points.
         404:
-            description: Sujeto no encontrado.
+            description: Subject not found.
     """
-    sujeto_id = request.args.get("id", type=int)
+    subject_id = request.args.get("id", type=int)
     
-    csv_data = ExportService.export_puntos_csv(sujeto_id)
+    csv_data = ExportService.export_points_csv(subject_id)
     if csv_data:
         return send_file(
             csv_data,
             as_attachment=True,
-            download_name=f"puntos_sujeto_{sujeto_id}.csv",
+            download_name=f"points_subject_{subject_id}.csv",
             mimetype="text/csv",
         )
     
-    return "Sujeto no encontrado", 404
+    return "Subject not found", 404
 
 
-@api_bp.route("/descargar-tasklogs")
-def descargar_tasklogs():
+@api_bp.route("/download-tasklogs")
+def download_tasklogs():
     """
-    Descarga los task logs registrados para un sujeto en particular.
+    Downloads task logs recorded for a specific subject.
     ---
     parameters:
         - name: id
           in: query
           type: integer
           required: true
-          description: ID del sujeto para descargar los task logs.
+          description: Subject ID to download task logs.
     responses:
         200:
-            description: Archivo CSV con los task logs registrados.
+            description: CSV file with recorded task logs.
         404:
-            description: Sujeto no encontrado.
+            description: Subject not found.
     """
-    sujeto_id = request.args.get("id", type=int)
+    subject_id = request.args.get("id", type=int)
     
-    csv_data = ExportService.export_tasklogs_csv(sujeto_id)
+    csv_data = ExportService.export_tasklogs_csv(subject_id)
     if csv_data:
         return send_file(
             csv_data,
             as_attachment=True,
-            download_name=f"tasklogs_sujeto_{sujeto_id}.csv",
+            download_name=f"tasklogs_subject_{subject_id}.csv",
             mimetype="text/csv",
         )
     else:
-        return "Sujeto no encontrado", 404
+        return "Subject not found", 404
 
 
-@api_bp.route("/descargar-todos")
-def descargar_todos():
+@api_bp.route("/download-all")
+def download_all():
     """
-    Descarga los puntos registrados para todos los sujetos en formato csv.
+    Downloads recorded points for all subjects in CSV format.
     ---
     responses:
         200:
-            description: Archivo CSV con los puntos registrados para todos los sujetos.
+            description: CSV file with recorded points for all subjects.
         404:
-            description: No hay sujetos registrados.
+            description: No registered subjects.
     """
-    csv_data = ExportService.export_all_puntos_csv()
+    csv_data = ExportService.export_all_points_csv()
     if csv_data:
         return send_file(
             csv_data,
             as_attachment=True,
-            download_name="puntos_todos.csv",
+            download_name="points_all.csv",
             mimetype="text/csv",
         )
     else:
-        return "No hay sujetos registrados", 404
+        return "No registered subjects", 404

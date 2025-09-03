@@ -32,7 +32,49 @@ db.init_app(app)
 # Register API blueprint
 app.register_blueprint(api_bp)
 
-swagger = Swagger(app)
+# Swagger configuration
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": 'apispec_1',
+            "route": '/apispec_1.json',
+            "rule_filter": lambda rule: True,  # all in
+            "model_filter": lambda tag: True,  # all in
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/apidocs/"
+}
+
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "User Gaze Track API",
+        "description": "API para el seguimiento de la mirada del usuario y gestión de datos",
+        "version": "1.0.0",
+        "contact": {
+            "name": "User Gaze Track Team",
+        }
+    },
+    "host": "localhost:5001",
+    "basePath": "/",
+    "schemes": ["https", "http"],
+    "securityDefinitions": {},
+    "tags": [
+        {
+            "name": "web",
+            "description": "Rutas de la interfaz web"
+        },
+        {
+            "name": "api",
+            "description": "Endpoints de la API REST"
+        }
+    ]
+}
+
+swagger = Swagger(app, config=swagger_config, template=swagger_template)
 
 
 @app.route("/", methods=["GET", "POST"])
