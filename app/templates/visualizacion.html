@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualización de Simulaciones</title>
+    <script src="https://cdn.plot.ly/plotly-3.1.0.min.js" charset="utf-8"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='bootstrap.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/visualizacion.css') }}"
+</head>
+<body>
+    <h1>Visualización de Sujeto</h1>
+    <div id="plots">
+        <div id="mouse-plot" class="plot"></div>
+        <div id="gaze-plot" class="plot"></div>
+    </div>
+
+    <!-- Js with plots -->
+    <script src="{{ url_for('static', filename='js/visualizacion.js') }}"></script>
+</body>
+</html>

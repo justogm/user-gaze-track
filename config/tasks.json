@@ -1,0 +1,74 @@
+{
+	"tasks": [
+	  {
+		"task": "Dirígete a la versión 1",
+		"type": "bool",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar salinidad del cremoso en la tina 2",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar humedad de la cámara 3",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "¿Cuántas cámaras de almacenamiento hay?",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Encontrar la pestaña de series temporales de temperatura de la tina 3.",
+		"type": "bool",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar la temperatura en la tina 3.",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar porcentaje de llenado en la tina 1.",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Determinar consumo eléctrico.",
+		"type": "numeric",
+		"version": 1
+	  },
+	  {
+		"task": "Dirigete a la versión 2",
+		"type": "bool",
+		"version": 2
+	  },
+	  {
+		"task": "Configurar 3 lotes.",
+		"type": "bool",
+		"version": 2
+	  },
+	  {
+		"task": "Determinar la temperatura en la tina 3.",
+		"type": "numeric",
+		"version": 2
+	  },
+	  {
+		"task": "Determinar porcentaje de llenado en la tina 1.",
+		"type": "numeric",
+		"version": 2
+	  },
+	  {
+		"task": "Determinar consumo eléctrico.",
+		"type": "numeric",
+		"version": 2
+	  },
+	  {
+		"task": "¿Qué queso se produjo en el lote más viejo (de la pestaña lote)?",
+		"type": "string",
+		"version": 2
+	  }
+	]
+  }

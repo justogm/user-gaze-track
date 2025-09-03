@@ -20,12 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
   ShowCalibrationPoint();
 
   // Manejar el clic en el botón "Entendido"
-  document.getElementById("btn-entendido").addEventListener("click", function () {
-    myModal.hide(); // Cierra el modal
-  });
+  document
+    .getElementById("btn-entendido")
+    .addEventListener("click", function () {
+      myModal.hide(); // Cierra el modal
+    });
 });
-
-
 
 /**
  * Show the Calibration Points
@@ -74,7 +74,7 @@ function calPointClick(node) {
 
     calibrated = true;
 
-    // showPrototype();
+    checkCalibrationAndShowButton();
   }
 }
 
@@ -98,27 +98,27 @@ window.onload = async function () {
   //start the webgazer tracker
   await webgazer
     .setRegression("ridge") /* currently must set regression and tracker */
-    .setTracker('clmtrackr')
+    .setTracker("TFFacemesh")
     .saveDataAcrossSessions(true)
     .begin();
   webgazer
-    .showVideoPreview(true) /* shows all video previews */
+    .showVideoPreview(false) /* shows all video previews */
     .showPredictionPoints(
-      true
+      false
     ) /* shows a square every 100 milliseconds where current prediction is */
     .applyKalmanFilter(
       true
-    ); /* Kalman Filter defaults to on. Can be toggled by user. */
+    ) /* Kalman Filter defaults to on. Can be toggled by user. */;
 
   //Set up the webgazer video feedback.
-  var setup = function () {
-    //Set up the main canvas. The main canvas is used to calibrate the webgazer.
-    var canvas = document.getElementById("plotting_canvas");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    canvas.style.position = "fixed";
-  };
-  setup();
+  // var setup = function () {
+  //   //Set up the main canvas. The main canvas is used to calibrate the webgazer.
+  //   var canvas = document.getElementById("plotting_canvas");
+  //   canvas.width = window.innerWidth;
+  //   canvas.height = window.innerHeight;
+  //   canvas.style.position = "fixed";
+  // };
+  // setup();
 };
 
 // Set to true if you want to save the data even if you reload the page.
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (prototypeUrl && prototypeUrl !== "null") {
         // Mostrar el iframe del prototipo
-        console.log(prototypeUrl)
+        console.log(prototypeUrl);
         const iframe = document.getElementById("prototype");
         iframe.src = prototypeUrl;
         iframe.style.display = "block";
@@ -204,15 +204,6 @@ function enviarPuntos(puntos) {
     });
 }
 
-// // Obtener referencia al iframe
-// const iframe = document.getElementById("prototype");
-
-// // Función para enviar un punto (x, y)
-// function enviarPuntoIframe(x, y) {
-//   const punto = { x, y }; // Crear el objeto con las coordenadas
-//   iframe.contentWindow.postMessage(punto, "http://127.0.0.1:5500"); // Enviar el mensaje al iframe
-// }
-
 let points = [];
 let mouse_position = { x: 0, y: 0 }; // Define mouse_position as an object
 
@@ -225,6 +216,17 @@ document.addEventListener("mousemove", (event) => {
 
 // Inicia WebGazer.js y establece el GazeListener
 document.addEventListener("DOMContentLoaded", function () {
+  const observer = new MutationObserver(() => {
+    const videos = document.querySelectorAll("#webgazerVideoContainer");
+    videos.forEach((video) => {
+      if (isCalibrated()) {
+        video.style.display = "none";
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
   webgazer
     .setGazeListener(function (data, elapsedTime) {
       if (data == null) {
@@ -232,24 +234,30 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       webgazer.util.bound(data);
 
-      if (isCalibrated()) {
+      webgazer.showVideoPreview(false);
+
+      const taskBar = document.getElementById("task-bar");
+
+      if (isCalibrated() && taskBar.style.display !== "block") {
         var xprediction = data.x; // Coordenadas x relativas al viewport
         var yprediction = data.y; // Coordenadas y relativas al viewport
 
-      // Add the current timestamp to each point
-      const currentTimestamp = new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" });
+        // Add the current timestamp to each point
+        const currentTimestamp = new Date().toLocaleString("en-US", {
+          timeZone: "America/Argentina/Buenos_Aires",
+        });
 
-      points.push({
-        fecha: currentTimestamp, // Add the timestamp here
-        gaze: {
-          x: xprediction,
-          y: yprediction,
-        },
-        mouse: {
-          x: mouse_position.x,
-          y: mouse_position.y,
-        },
-      });
+        points.push({
+          fecha: currentTimestamp, // Add the timestamp here
+          gaze: {
+            x: xprediction,
+            y: yprediction,
+          },
+          mouse: {
+            x: mouse_position.x,
+            y: mouse_position.y,
+          },
+        });
 
         if (points.length == 20) {
           console.log("Enviando puntos...");
@@ -259,4 +267,183 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .begin();
+});
+
+function enviarTaskLogIndividual(taskLog) {
+  fetch("/guardar-tasklogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      taskLogs: [taskLog], // Enviar solo el log actual
+      sujeto_id: parseInt(id, 10), // ID del sujeto
+    }),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log("TaskLog enviado:", result);
+    })
+    .catch((error) => {
+      console.error("Error al enviar TaskLog:", error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Obtener las tareas desde la ruta /tasks
+  fetch("/tasks")
+    .then((response) => response.json())
+    .then((tasks) => {
+      // Guardar en un arreglo las tasks.tasks
+      tasksArray = tasks.tasks;
+
+      console.log(tasksArray);
+    })
+    .catch((error) =>
+      console.error("Error al cargar las tareas desde /tasks:", error)
+    );
+
+  // Botón para abrir la barra
+  document.getElementById("toggle-bar").addEventListener("click", function () {
+    document.getElementById("task-bar").style.display = "block";
+  });
+
+  // Botón para cerrar la barra
+  document.getElementById("close-bar").addEventListener("click", function () {
+    document.getElementById("task-bar").style.display = "none";
+  });
+
+  // Manejar el envío de la respuesta
+  document
+    .getElementById("task-bar-submit")
+    .addEventListener("click", function () {
+      const userInput = document.getElementById("task-bar-input").value;
+
+      taskLogs[currentTaskIndex].endTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      taskLogs[currentTaskIndex].response = userInput;
+
+      enviarTaskLogIndividual(taskLogs[currentTaskIndex]);
+
+      console.log(
+        `Respuesta a "${tasksArray[currentTaskIndex]}": ${userInput}`
+      );
+      currentTaskIndex++;
+      document.getElementById("task-bar-input").value = ""; // Limpiar el input
+      showNextTaskInBar(); // Mostrar la siguiente tarea
+    });
+
+  document.getElementById("skip-button").addEventListener("click", function () {
+    // Aquí puedes agregar la lógica para omitir la tarea actual
+
+    taskLogs[currentTaskIndex].endTime = new Date().toLocaleString("en-US", {
+      timeZone: "America/Argentina/Buenos_Aires",
+    });
+    taskLogs[currentTaskIndex].response = "skipped"; // Opción de omitir
+
+    enviarTaskLogIndividual(taskLogs[currentTaskIndex]);
+
+    document.getElementById("task-bar-input").value = ""; // Limpiar el input
+    console.log("Tarea omitida");
+    currentTaskIndex++;
+    showNextTaskInBar(); // Mostrar la siguiente tarea
+  });
+});
+
+let startTime = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Botón para abrir la barra
+  document.getElementById("toggle-bar").addEventListener("click", function () {
+    const taskBar = document.getElementById("task-bar");
+    const prototype = document.getElementById("prototype");
+
+    taskBar.classList.add("visible");
+    taskBar.style.display = "block";
+
+    document.getElementById("toggle-bar").style.display = "none";
+
+    prototype.style.pointerEvents = "none";
+    prototype.style.filter = "blur(5px)";
+
+    if (!startTime) {
+      startTime = new Date().toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      });
+      console.log("Tiempos de inicio:", startTime);
+    }
+
+    if (currentTaskIndex === 0 && tasksArray.length > 0) {
+      showNextTaskInBar();
+    }
+  });
+
+  // Botón para cerrar la barra
+  document.getElementById("close-bar").addEventListener("click", function () {
+    const taskBar = document.getElementById("task-bar");
+    const prototype = document.getElementById("prototype");
+
+    taskBar.classList.remove("visible");
+    taskBar.style.display = "none";
+
+    document.getElementById("toggle-bar").style.display = "block";
+
+    prototype.style.pointerEvents = "auto";
+    prototype.style.filter = "none";
+  });
+});
+
+let tasksArray = []; // Inicializa como un arreglo vacío
+let taskLogs = []; // Inicializa como un arreglo vacío
+
+function showNextTaskInBar() {
+  console.log(taskLogs);
+  const taskBarInput = document.getElementById("task-bar-input");
+
+  if (currentTaskIndex < tasksArray.length) {
+    const taskText = tasksArray[currentTaskIndex].task;
+    const taskType = tasksArray[currentTaskIndex].type;
+
+    // Registrar el tiempo de inicio de la tarea actual
+    taskLogs[currentTaskIndex] = {
+      startTime:
+        currentTaskIndex === 0
+          ? startTime // Usar el tiempo global si es la primera tarea
+          : new Date().toLocaleString("en-US", {
+              timeZone: "America/Argentina/Buenos_Aires",
+            }),
+      endTime: null,
+      response: null,
+    };
+
+    document.getElementById("task-bar-text").innerText = taskText;
+
+    if (taskType === "bool") {
+      taskBarInput.style.display = "none"; // Oculta el input
+    } else {
+      taskBarInput.style.display = "block"; // Muestra el input
+    }
+  } else {
+    window.location.href = "/fin-medicion";
+  }
+}
+
+function checkCalibrationAndShowButton() {
+  if (calibrated) {
+    const toggleBar = document.getElementById("toggle-bar");
+    toggleBar.style.display = "block";
+
+    // Mostrar la primera tarea en la barra
+    if (tasksArray.length > 0) {
+      currentTaskIndex = 0; // Inicializar el índice de tareas
+    } else {
+      console.error("No hay tareas disponibles para mostrar.");
+    }
+  }
+}
+
+// Ocultar el botón de tarea inicialmente
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("toggle-bar").style.display = "none";
 });

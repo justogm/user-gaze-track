@@ -20,7 +20,7 @@ from flask import (
 import numpy as np
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
-from app.models import db, Sujeto, Punto, Medicion
+from app.models import db, Sujeto, Punto, Medicion, TaskLog
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -92,6 +92,18 @@ def embed():
         description: Página de seguimiento ocular.
     """
     return render_template("embed.html", id=request.args.get("id"))
+
+
+@app.route("/fin-medicion")
+def fin_medicion():
+    """
+    Muestra la página de finalización de la medición.
+    ---
+    responses:
+        200:
+            description: Página de finalización de la medición.
+    """
+    return render_template("fin.html")
 
 
 @app.route("/sujetos")
@@ -217,6 +229,55 @@ def guardar_puntos():
     return jsonify({"status": "success"})
 
 
+@app.route("/guardar-tasklogs", methods=["POST"])
+def guardar_tasklogs():
+    """
+    Guarda los registros de tareas (taskLogs) en la base de datos.
+    ---
+    parameters:
+        - name: taskLogs
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+                type: object
+                properties:
+                    start_time:
+                        type: string
+                        format: date-time
+                    end_time:
+                        type: string
+                        format: date-time
+                    response:
+                        type: string
+                    sujeto_id:
+                        type: integer
+    responses:
+        200:
+            description: TaskLogs guardados exitosamente.
+    """
+    data = request.get_json()
+    task_logs = data["taskLogs"]
+    sujeto_id = data["sujeto_id"]
+
+    for log in task_logs:
+        nuevo_log = TaskLog(
+            start_time=datetime.strptime(log["startTime"], "%m/%d/%Y, %I:%M:%S %p"),
+            end_time=(
+                datetime.strptime(log["endTime"], "%m/%d/%Y, %I:%M:%S %p")
+                if log["endTime"]
+                else None
+            ),
+            response=log["response"],
+            sujeto_id=sujeto_id,
+        )
+        db.session.add(nuevo_log)
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "TaskLogs guardados exitosamente."})
+
+
 @app.route("/config")
 def config():
     """
@@ -227,6 +288,18 @@ def config():
             description: Archivo de configuración.
     """
     return send_from_directory("config", "config.json")
+
+
+@app.route("/tasks")
+def tasks():
+    """
+    Descarga el archivo de tareas.
+    ---
+    responses:
+        200:
+            description: Archivo de tareas.
+    """
+    return send_from_directory("config", "tasks.json")
 
 
 @app.route("/descargar-puntos")
@@ -286,6 +359,126 @@ def descargar_puntos():
     return "Sujeto no encontrado", 404
 
 
+@app.route("/api/get-sujetos", methods=["GET"])
+def api_sujetos():
+    """
+    Devuelve información sobre los sujetos registrados.
+    ---
+    responses:
+        200:
+            description: JSON con la información de los sujetos.
+    """
+    sujetos = Sujeto.query.all()
+    sujetos_info = [
+        {
+            "id": sujeto.id,
+            "nombre": sujeto.nombre,
+            "apellido": sujeto.apellido,
+            "edad": sujeto.edad,
+        }
+        for sujeto in sujetos
+    ]
+    return jsonify(sujetos_info)
+
+
+@app.route("/api/get-user-points")
+def get_user_points():
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        # Obtener las mediciones del sujeto
+        mediciones = Medicion.query.filter_by(sujeto_id=sujeto.id).all()
+
+        # Construir una lista de puntos con los datos necesarios
+        puntos = []
+        for medicion in mediciones:
+            punto = {
+                "fecha": medicion.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+                "x_mouse": medicion.punto_mouse.x if medicion.punto_mouse else None,
+                "y_mouse": medicion.punto_mouse.y if medicion.punto_mouse else None,
+                "x_gaze": medicion.punto_gaze.x if medicion.punto_gaze else None,
+                "y_gaze": medicion.punto_gaze.y if medicion.punto_gaze else None,
+            }
+            puntos.append(punto)
+
+        return jsonify({"sujeto_id": sujeto_id, "puntos": puntos})
+    return "Sujeto no encontrado", 404
+
+
+@app.route("/api/get-user-tasklogs")
+def get_user_tasklogs():
+    """
+    Devuelve los task logs de un sujeto específico.
+    ---
+    parameters:
+        - name: id
+          in: query
+          type: integer
+          required: true
+          description: ID del sujeto para obtener los task logs.
+    responses:
+        200:
+            description: JSON con los task logs del sujeto.
+        404:
+            description: Sujeto no encontrado.
+    """
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        # Obtener los task logs del sujeto
+        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto.id).all()
+        task_logs_info = [
+            {
+                "start_time": log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "end_time": (
+                    log.end_time.strftime("%Y-%m-%d %H:%M:%S") if log.end_time else None
+                ),
+                "response": log.response,
+            }
+            for log in task_logs
+        ]
+        return jsonify({"sujeto_id": sujeto_id, "task_logs": task_logs_info})
+    return "Sujeto no encontrado", 404
+
+
+@app.route("/descargar-tasks")
+def descargar_tasklogs():
+    sujeto_id = request.args.get("id", type=int)
+
+    sujeto = Sujeto.query.filter_by(id=sujeto_id).first()
+
+    if sujeto:
+        si = io.StringIO()
+        escritor_csv = csv.writer(si)
+
+        # Escribir encabezados
+        escritor_csv.writerow(["start_time", "end_time", "response"])
+        # Obtener los task logs del sujeto
+        task_logs = TaskLog.query.filter_by(sujeto_id=sujeto_id).all()
+        # Escribir filas
+        for log in task_logs:
+            fila = [
+                log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
+                log.end_time.strftime("%Y-%m-%d %H:%M:%S") if log.end_time else None,
+                log.response,
+            ]
+            escritor_csv.writerow(fila)
+        si.seek(0)
+        si_bytes = io.BytesIO(si.getvalue().encode("utf-8"))
+        return send_file(
+            si_bytes,
+            as_attachment=True,
+            download_name=f"tasklogs_sujeto_{sujeto_id}.csv",
+            mimetype="text/csv",
+        )
+    else:
+        return "Sujeto no encontrado", 404
+
+
 @app.route("/descargar-todos")
 def descargar_todos():
     """
@@ -326,6 +519,10 @@ def descargar_todos():
         download_name="puntos_todos.csv",
         mimetype="text/csv",
     )
+
+@app.route("/visualizacion")
+def visualizacion():
+    return render_template("visualizacion.html")
 
 
 if __name__ == "__main__":

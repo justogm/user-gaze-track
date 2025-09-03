@@ -48,41 +48,25 @@
         <input type="button" class="Calibration" id="Pt8"></input>
         <input type="button" class="Calibration" id="Pt9"></input>
     </div>
-    <!-- <script>
-      console.log("Iniciando WebGazer...");
-      webgazer
-        .setGazeListener(function (data, elapsedTime) {
-          if (data == null) {
-            return;
-          }
-          console.log("WebGazer esta funcionando");
-          webgazer.util.bound(data);
 
-          if (isCalibrated()) {
-            var xprediction = data.x; // estas coordenadas x son relativas al viewport
-            var yprediction = data.y; // estas coordenadas y son relativas al viewport
-            console.log(xprediction, yprediction); // el tiempo transcurrido se basa en el tiempo desde que se llamó a begin
-            // enviarPuntoIframe(xprediction, yprediction);
+    <!-- Botón flotante para abrir la barra -->
+    <button id="toggle-bar" class="btn btn-primary" style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
+      Mostrar Tarea
+    </button>
 
-            points.push({
-              gaze: {
-                x: xprediction,
-                y: yprediction,
-              },
-              mouse: {
-                x: mouse_position.x,
-                y: mouse_position.y,
-              },
-            });
-
-            if (points.length == 20) {
-              console.log("Sending points...");
-              enviarPuntos(points);
-              points = [];
-            }
-          }
-        })
-      .begin();
-    </script> -->
+    <!-- Barra desplegable -->
+    <div id="task-bar">
+        <div>
+            <p id="task-bar-text">Pregunta aquí</p>
+        </div>
+        <div>
+            <input type="text" id="task-bar-input" class="form-control" placeholder="Tu respuesta">
+            <div id="task-bar-buttons">
+              <button id="task-bar-submit" class="btn btn-primary mt-2">Hecho</button>
+              <button id="close-bar" class="btn btn-primary mt-2">Cerrar</button>
+              <buttton id="skip-button" class="btn btn-primary mt-2">Saltar</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
