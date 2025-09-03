@@ -10,35 +10,39 @@ Esta aplicación web utiliza Flask como backend para gestionar la entrada de dat
 
 4. **Página de resultados para un sujeto (/resultados?id={sujeto}):** Se puede ver el heatmap de la mirada de un sujeto y descargar sus datos en formato csv.
 
-## Configuración del Proyecto
+## Uso del Proyecto
 
-1. Clona este repositorio:
+### 1. Clona este repositorio
 
-    ```bash
-    git clone https://github.com/justogm/user-gaze-track.git
-    cd user-gaze-track
-    ```
+```bash
+git clone https://github.com/justogm/user-gaze-track.git
+cd user-gaze-track
+```
 
-2. Instala los requerimientos
+### 2. Instala los requerimientos
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+pip install -r requirements.txt
+```
 
-3. Generar certificados
+### 3. Generar certificados
 Para poder utilizar el módulo de gaze tracking debe soportar https. Por ello, deben crearse las credenciales para que funcione correctamente.
 
-    ```bash
-    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-    ```
+```bash
+openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+```
 
 Este comando realizará una serie de preguntas y finalmente creará los archivos *cert.pem* y *key.pem* que utilizará Flask.
 
-4. Correr la herramienta
+### 4. Configurar la herramienta
 
-    ```bash
-    python app.py
-    ```
+Se debe modificar el archivo [config/config.json](config/config.json) estableciendo el puerto en el que se debe correr y el la url a una imagen o prototipo que se desee utilizar.
+
+### 5. Correr la herramienta
+
+```bash
+python app.py
+```
 
 ## Importante
 
@@ -54,18 +58,19 @@ Este comando realizará una serie de preguntas y finalmente creará los archivos
 
 ## Capturas de pantalla
 
-1. Ingreso de datos
-    Puede ser modificado de acuerdo a las variables que se consideren relevantes.
+### 1. Ingreso de datos
 
-    ![Data Entry](assets/readme/data-entry.png)
+Puede ser modificado de acuerdo a las variables que se consideren relevantes.
 
-2. Etapa de calibración e instrucciones
+![Data Entry](assets/readme/data-entry.png)
 
-    ![Calibración e instrucciones](assets/readme/instrucciones-y-calibracion.png)
+### 2. Etapa de calibración e instrucciones
 
-    *La imagen de instrucciones para la calibración es la proporcionada por el módulo, sería conveniente crear una que se encuentre traducida al español.*
+![Calibración e instrucciones](assets/readme/instrucciones-y-calibracion.png)
 
-3. Presentación del prototipo
+*La imagen de instrucciones para la calibración es la proporcionada por el módulo, sería conveniente crear una que se encuentre traducida al español.*
+
+### 3. Presentación del prototipo
 
 ![Presentación del prototipo](assets/readme/prototipo-figma.png)
 
@@ -73,5 +78,7 @@ Este comando realizará una serie de preguntas y finalmente creará los archivos
 
 - [ ] Evaluar comportamiento del modulo en caso de tener el prototipo en pantalla completa.
 - [ ] Analizar alternativas para la presentación del prototipo.
-- [ ] Facilitar el cambio del prototipo, no dejarlo hardcodeado.
-- [ ] Desarrollar una app paralela para el acceso a los datos generados y su manipulación.
+- [x] Facilitar el cambio del prototipo, no dejarlo hardcodeado.
+  - Se crea archivo de configuración, ver [sección de configuración](#4-configurar-la-herramienta).
+- [x] Desarrollar una app paralela para el acceso a los datos generados y su manipulación.
+  - Se desarrolló la ruta `/sujetos`
