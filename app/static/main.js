@@ -148,8 +148,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Obtener la configuración desde la ruta /config
-  fetch("/config")
+  // Obtener la configuración desde la ruta /api/config
+  fetch("/api/config")
     .then((response) => response.json())
     .then((config) => {
       const prototypeUrl = config.prototype_url;
@@ -183,17 +183,17 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .catch((error) =>
-      console.error("Error al cargar la configuración desde /config:", error)
+      console.error("Error al cargar la configuración desde /api/config:", error)
     );
 });
 
 function enviarPuntos(puntos) {
-  fetch("/guardar-puntos", {
+  fetch("/api/save-points", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ puntos: puntos, id: parseInt(id, 10) }),
+    body: JSON.stringify({ points: puntos, id: parseInt(id, 10) }),
   })
     .then((response) => response.text())
     .then((result) => {
@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         points.push({
-          fecha: currentTimestamp, // Add the timestamp here
+          date: currentTimestamp, // Add the timestamp here
           gaze: {
             x: xprediction,
             y: yprediction,
@@ -261,6 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (points.length == 20) {
           console.log("Enviando puntos...");
+          console.log(points);
           enviarPuntos(points);
           points = [];
         }
@@ -270,14 +271,14 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function enviarTaskLogIndividual(taskLog) {
-  fetch("/guardar-tasklogs", {
+  fetch("/api/save-tasklogs", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       taskLogs: [taskLog], // Enviar solo el log actual
-      sujeto_id: parseInt(id, 10), // ID del sujeto
+      subject_id: parseInt(id, 10), // ID del sujeto
     }),
   })
     .then((response) => response.json())
@@ -290,8 +291,8 @@ function enviarTaskLogIndividual(taskLog) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Obtener las tareas desde la ruta /tasks
-  fetch("/tasks")
+  // Obtener las tareas desde la ruta /api/tasks
+  fetch("/api/tasks")
     .then((response) => response.json())
     .then((tasks) => {
       // Guardar en un arreglo las tasks.tasks
@@ -300,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log(tasksArray);
     })
     .catch((error) =>
-      console.error("Error al cargar las tareas desde /tasks:", error)
+      console.error("Error al cargar las tareas desde /api/tasks:", error)
     );
 
   // Botón para abrir la barra

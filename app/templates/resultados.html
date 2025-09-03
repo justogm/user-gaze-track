@@ -70,11 +70,11 @@
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       function descargarArchivo() {
-      window.location.href = `/descargar-puntos?id=${id}`;
+      window.location.href = `/api/download-points?id=${id}`;
       }
 
       function descargarTareas() {
-      window.location.href = `/descargar-tasks?id=${id}`;
+      window.location.href = `/api/download-tasklogs?id=${id}`;
       }
       document.getElementById('btn-descarga-tasks').addEventListener('click', function() {
       descargarTareas();
@@ -89,7 +89,7 @@
       const id = urlParams.get('id');
 
       // Redirigir a la ruta de descarga con el ID
-      window.location.href = `/descargar-puntos?id=${id}`;
+      window.location.href = `/api/download-points?id=${id}`;
       }
 
       window.onload = function() {
@@ -98,7 +98,7 @@
 
       // console.log('Puntos', puntos);
 
-      fetch("/config")
+      fetch("/api/config")
       .then((response) => response.json())
       .then((config) => {
         const prototypeUrl = config.prototype_url;
@@ -132,7 +132,7 @@
         }
       })
       .catch((error) =>
-        console.error("Error al cargar la configuración desde /config:", error)
+        console.error("Error al cargar la configuración desde /api/config:", error)
       );
 
         // Ajusta las coordenadas
