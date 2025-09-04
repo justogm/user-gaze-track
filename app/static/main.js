@@ -74,6 +74,9 @@ function calPointClick(node) {
 
     calibrated = true;
 
+    // Ocultar el video de la cámara inmediatamente después de la calibración
+    hideWebgazerVideo();
+
     checkCalibrationAndShowButton();
   }
 }
@@ -93,6 +96,20 @@ function stop_storing_points_variable() {
   webgazer.params.storingPoints = false;
 }
 
+/*
+ * Hide the webgazer video preview
+ */
+function hideWebgazerVideo() {
+  // Ocultar el video preview
+  webgazer.showVideoPreview(false);
+  
+  // También ocultar manualmente cualquier elemento de video existente
+  const videos = document.querySelectorAll("#webgazerVideoContainer, #webgazerVideoFeed, video");
+  videos.forEach((video) => {
+    video.style.display = "none";
+  });
+}
+
 // -----------------------------
 window.onload = async function () {
   //start the webgazer tracker
@@ -101,6 +118,8 @@ window.onload = async function () {
     .setTracker("TFFacemesh")
     .saveDataAcrossSessions(true)
     .begin();
+  
+  // Configurar webgazer para ocultar el video desde el inicio
   webgazer
     .showVideoPreview(false) /* shows all video previews */
     .showPredictionPoints(
@@ -109,6 +128,11 @@ window.onload = async function () {
     .applyKalmanFilter(
       true
     ) /* Kalman Filter defaults to on. Can be toggled by user. */;
+
+  // Asegurar que el video esté oculto después de la inicialización
+  setTimeout(() => {
+    hideWebgazerVideo();
+  }, 1000);
 
   //Set up the webgazer video feedback.
   // var setup = function () {
@@ -148,8 +172,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get("id");
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Obtener la configuración desde la ruta /config
-  fetch("/config")
+  // Obtener la configuración desde la ruta /api/config
+  fetch("/api/config")
     .then((response) => response.json())
     .then((config) => {
       const prototypeUrl = config.prototype_url;
@@ -183,17 +207,17 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     })
     .catch((error) =>
-      console.error("Error al cargar la configuración desde /config:", error)
+      console.error("Error al cargar la configuración desde /api/config:", error)
     );
 });
 
 function enviarPuntos(puntos) {
-  fetch("/guardar-puntos", {
+  fetch("/api/save-points", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ puntos: puntos, id: parseInt(id, 10) }),
+    body: JSON.stringify({ points: puntos, id: parseInt(id, 10) }),
   })
     .then((response) => response.text())
     .then((result) => {
@@ -217,7 +241,8 @@ document.addEventListener("mousemove", (event) => {
 // Inicia WebGazer.js y establece el GazeListener
 document.addEventListener("DOMContentLoaded", function () {
   const observer = new MutationObserver(() => {
-    const videos = document.querySelectorAll("#webgazerVideoContainer");
+    // Ocultar el video siempre, no solo cuando esté calibrado
+    const videos = document.querySelectorAll("#webgazerVideoContainer, #webgazerVideoFeed, video");
     videos.forEach((video) => {
       if (isCalibrated()) {
         video.style.display = "none";
@@ -234,8 +259,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       webgazer.util.bound(data);
 
-      webgazer.showVideoPreview(false);
-
       const taskBar = document.getElementById("task-bar");
 
       if (isCalibrated() && taskBar.style.display !== "block") {
@@ -248,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         points.push({
-          fecha: currentTimestamp, // Add the timestamp here
+          date: currentTimestamp, // Add the timestamp here
           gaze: {
             x: xprediction,
             y: yprediction,
@@ -261,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (points.length == 20) {
           console.log("Enviando puntos...");
+          console.log(points);
           enviarPuntos(points);
           points = [];
         }
@@ -270,14 +294,14 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function enviarTaskLogIndividual(taskLog) {
-  fetch("/guardar-tasklogs", {
+  fetch("/api/save-tasklogs", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      taskLogs: [taskLog], // Enviar solo el log actual
-      sujeto_id: parseInt(id, 10), // ID del sujeto
+      taskLogs: [taskLog],
+      subject_id: parseInt(id, 10),
     }),
   })
     .then((response) => response.json())
@@ -290,17 +314,15 @@ function enviarTaskLogIndividual(taskLog) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Obtener las tareas desde la ruta /tasks
-  fetch("/tasks")
+  fetch("/api/tasks")
     .then((response) => response.json())
     .then((tasks) => {
-      // Guardar en un arreglo las tasks.tasks
       tasksArray = tasks.tasks;
 
       console.log(tasksArray);
     })
     .catch((error) =>
-      console.error("Error al cargar las tareas desde /tasks:", error)
+      console.error("Error al cargar las tareas desde /api/tasks:", error)
     );
 
   // Botón para abrir la barra

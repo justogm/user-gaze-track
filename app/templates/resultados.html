@@ -70,35 +70,26 @@
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id');
       function descargarArchivo() {
-      window.location.href = `/descargar-puntos?id=${id}`;
+      window.location.href = `/api/download-points?id=${id}`;
       }
 
       function descargarTareas() {
-      window.location.href = `/descargar-tasks?id=${id}`;
+      window.location.href = `/api/download-tasklogs?id=${id}`;
       }
       document.getElementById('btn-descarga-tasks').addEventListener('click', function() {
       descargarTareas();
       });
       document.getElementById('btn-descarga').addEventListener('click', function() {
-      descargarPuntos();
+      descargarArchivo();
       });
-
-      function descargarPuntos() {
-      // Obtener el ID de la tarea desde la URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get('id');
-
-      // Redirigir a la ruta de descarga con el ID
-      window.location.href = `/descargar-puntos?id=${id}`;
-      }
 
       window.onload = function() {
       // Convertir el arreglo de puntos de Python a un arreglo de JavaScript
-      var puntos = {{ puntos|tojson }};
+      var puntosOriginales = {{ puntos|tojson }};
 
-      // console.log('Puntos', puntos);
+      // console.log('Puntos', puntosOriginales);
 
-      fetch("/config")
+      fetch("/api/config")
       .then((response) => response.json())
       .then((config) => {
         const prototypeUrl = config.prototype_url;
@@ -130,37 +121,36 @@
           imgElement.src = imgPath;
           imgElement.style.display = "block";
         }
-      })
-      .catch((error) =>
-        console.error("Error al cargar la configuración desde /config:", error)
-      );
 
         // Ajusta las coordenadas
-        var puntos = puntos.map(punto => ({
-        x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
-        y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
+        var puntos = puntosOriginales.map(punto => ({
+          x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
+          y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
         }));
         var data = {
-        max: 10, // Ajusta este valor para ver más intensidad
-        min: 0,
-        data: puntos.map(punto => ({
-          x: parseFloat(punto.x),
-          y: parseFloat(punto.y),
-          value: 5 // Puedes cambiarlo para diferentes intensidades
-        }))
+          max: 10, // Ajusta este valor para ver más intensidad
+          min: 0,
+          data: puntos.map(punto => ({
+            x: parseFloat(punto.x),
+            y: parseFloat(punto.y),
+            value: 5 // Puedes cambiarlo para diferentes intensidades
+          }))
         };
 
-      // Comprobando los puntos
-      console.log('Puntos:', puntos);
+        // Comprobando los puntos
+        console.log('Puntos:', puntos);
 
-      // Configurando heatmap
-      console.log('Configurando heatmap con los siguientes datos:', data);
-      var heatmapInstance = h337.create({
-      container: document.querySelector('.heatmap')
-      });
-      heatmapInstance.setData(data);
-
-      heatmapInstance.repaint();
+        // Configurando heatmap
+        console.log('Configurando heatmap con los siguientes datos:', data);
+        var heatmapInstance = h337.create({
+          container: document.querySelector('.heatmap')
+        });
+        heatmapInstance.setData(data);
+        heatmapInstance.repaint();
+      })
+      .catch((error) =>
+        console.error("Error al cargar la configuración desde /api/config:", error)
+      );
       };
     </script>
   </body>
