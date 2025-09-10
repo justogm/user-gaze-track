@@ -17,17 +17,19 @@ async function cargarDatos() {
         }
         const data = await response.json();
 
-        if (!data.puntos || data.puntos.length === 0) {
+        console.log("Datos recibidos:", data);
+
+        if (!data.points || data.points.length === 0) {
             console.warn("No se encontraron puntos para este sujeto");
             return;
         }
 
         // === Animación Mouse ===
-        let mouseFrames = data.puntos.map((p, i) => ({
+        let mouseFrames = data.points.map((p, i) => ({
             name: i.toString(),
             data: [{
-                x: data.puntos.slice(0, i + 1).map(q => q.x_mouse),
-                y: data.puntos.slice(0, i + 1).map(q => q.y_mouse),
+                x: data.points.slice(0, i + 1).map(q => q.x_mouse),
+                y: data.points.slice(0, i + 1).map(q => q.y_mouse),
                 mode: "markers+lines",
                 marker: { size: 6, color: "blue" }
             }]
@@ -77,8 +79,8 @@ async function cargarDatos() {
         };
 
         Plotly.newPlot("mouse-plot", [{
-            x: [data.puntos[0].x_mouse],
-            y: [data.puntos[0].y_mouse],
+            x: [data.points[0].x_mouse],
+            y: [data.points[0].y_mouse],
             mode: "markers+lines",
             marker: { size: 6, color: "blue" }
         }], mouseLayout).then(() => {
@@ -86,11 +88,11 @@ async function cargarDatos() {
         });
 
         // === Animación Gaze ===
-        let gazeFrames = data.puntos.map((p, i) => ({
+        let gazeFrames = data.points.map((p, i) => ({
             name: i.toString(),
             data: [{
-                x: data.puntos.slice(0, i + 1).map(q => q.x_gaze),
-                y: data.puntos.slice(0, i + 1).map(q => q.y_gaze),
+                x: data.points.slice(0, i + 1).map(q => q.x_gaze),
+                y: data.points.slice(0, i + 1).map(q => q.y_gaze),
                 mode: "markers+lines",
                 marker: { size: 6, color: "red" }
             }]
@@ -140,8 +142,8 @@ async function cargarDatos() {
         };
 
         Plotly.newPlot("gaze-plot", [{
-            x: [data.puntos[0].x_gaze],
-            y: [data.puntos[0].y_gaze],
+            x: [data.points[0].x_gaze],
+            y: [data.points[0].y_gaze],
             mode: "markers+lines",
             marker: { size: 6, color: "red" }
         }], gazeLayout).then(() => {

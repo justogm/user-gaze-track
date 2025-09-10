@@ -22,7 +22,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    basedir, "instance", "usergazetrack.db"
+    basedir, "../instance", "usergazetrack.db"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    with open("config/config.json", "r", encoding="utf-8") as config_file:
+    with open("src/config/config.json", "r", encoding="utf-8") as config_file:
         config_data = json.load(config_file)
     port_value = config_data.get("port")
     if port_value is None or port_value == "null":  # Check if port is None or "null"

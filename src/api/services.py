@@ -77,7 +77,7 @@ class MeasurementService:
             return None
         
         measurements = Medicion.query.filter_by(sujeto_id=subject.id).all()
-        
+
         points = []
         for measurement in measurements:
             point = {
@@ -88,6 +88,7 @@ class MeasurementService:
                 "y_gaze": measurement.punto_gaze.y if measurement.punto_gaze else None,
             }
             points.append(point)
+
 
         return {"subject_id": subject_id, "points": points}
 
