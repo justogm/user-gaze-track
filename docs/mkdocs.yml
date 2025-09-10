@@ -1,0 +1,43 @@
+site_name: User Gaze Tracking Documentation
+site_description: Web application for gaze and mouse tracking using WebGazer.js
+site_url: https://github.com/justogm/user-gaze-track
+repo_url: https://github.com/justogm/user-gaze-track
+repo_name: justogm/user-gaze-track
+
+theme: 
+  name: readthedocs
+  navigation_depth: 3
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting_started/installation.md
+    - Quick Start: getting_started/quickstart.md
+    - Configuration: getting_started/configuration.md
+  - User Guide:
+    - Overview: user_guide/overview.md
+    - Features:
+      - Home Page: user_guide/features/home.md
+      - Gaze Tracking: user_guide/features/gaze_tracking.md
+      - Subjects Management: user_guide/features/subjects.md
+      - Results & Analytics: user_guide/features/results.md
+  - API Reference:
+    - Web Routes: api_reference/web_routes.md
+    - REST API: api_reference/rest_api.md
+    - Models: api_reference/models.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Architecture: development/architecture.md
+    - Testing: development/testing.md
+  - Deployment:
+    - Production Setup: deployment/production.md
+    - Docker: deployment/docker.md
+  - Troubleshooting: troubleshooting.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - pymdownx.superfences
