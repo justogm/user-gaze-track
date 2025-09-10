@@ -5,7 +5,7 @@ API routes for the user gaze tracking application.
 from flask import Blueprint, request, jsonify, send_file, send_from_directory
 from .services import SubjectService, MeasurementService, TaskLogService, ExportService
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
 @api_bp.route("/get-subjects", methods=["GET"])
@@ -39,7 +39,7 @@ def get_user_points():
             description: Subject not found.
     """
     subject_id = request.args.get("id", type=int)
-    
+
     result = MeasurementService.get_user_points(subject_id)
     if result:
         return jsonify(result)
@@ -64,7 +64,7 @@ def get_user_tasklogs():
             description: Subject not found.
     """
     subject_id = request.args.get("id", type=int)
-    
+
     result = TaskLogService.get_user_tasklogs(subject_id)
     if result:
         return jsonify(result)
@@ -191,7 +191,7 @@ def download_points():
             description: Subject not found.
     """
     subject_id = request.args.get("id", type=int)
-    
+
     csv_data = ExportService.export_points_csv(subject_id)
     if csv_data:
         return send_file(
@@ -200,7 +200,7 @@ def download_points():
             download_name=f"points_subject_{subject_id}.csv",
             mimetype="text/csv",
         )
-    
+
     return "Subject not found", 404
 
 
@@ -222,7 +222,7 @@ def download_tasklogs():
             description: Subject not found.
     """
     subject_id = request.args.get("id", type=int)
-    
+
     csv_data = ExportService.export_tasklogs_csv(subject_id)
     if csv_data:
         return send_file(

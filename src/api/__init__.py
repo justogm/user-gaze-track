@@ -9,4 +9,4 @@ from .routes import api_bp
 from .config import API_VERSION, API_PREFIX
 
 __version__ = API_VERSION
-__all__ = ['api_bp', 'API_VERSION', 'API_PREFIX']
+__all__ = ["api_bp", "API_VERSION", "API_PREFIX"]

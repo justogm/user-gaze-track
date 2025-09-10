@@ -37,15 +37,15 @@ swagger_config = {
     "headers": [],
     "specs": [
         {
-            "endpoint": 'apispec_1',
-            "route": '/apispec_1.json',
+            "endpoint": "apispec_1",
+            "route": "/apispec_1.json",
             "rule_filter": lambda rule: True,  # all in
             "model_filter": lambda tag: True,  # all in
         }
     ],
     "static_url_path": "/flasgger_static",
     "swagger_ui": True,
-    "specs_route": "/apidocs/"
+    "specs_route": "/apidocs/",
 }
 
 swagger_template = {
@@ -56,22 +56,16 @@ swagger_template = {
         "version": "1.0.0",
         "contact": {
             "name": "User Gaze Track Team",
-        }
+        },
     },
     "host": "localhost:5001",
     "basePath": "/",
     "schemes": ["https", "http"],
     "securityDefinitions": {},
     "tags": [
-        {
-            "name": "web",
-            "description": "Rutas de la interfaz web"
-        },
-        {
-            "name": "api",
-            "description": "Endpoints de la API REST"
-        }
-    ]
+        {"name": "web", "description": "Rutas de la interfaz web"},
+        {"name": "api", "description": "Endpoints de la API REST"},
+    ],
 }
 
 swagger = Swagger(app, config=swagger_config, template=swagger_template)
