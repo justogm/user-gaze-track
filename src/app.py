@@ -22,7 +22,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__, template_folder="app/templates", static_folder="app/static")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-    basedir, "../instance", "usergazetrack.db"
+    basedir, "instance", "usergazetrack.db"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
