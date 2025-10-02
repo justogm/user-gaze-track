@@ -36,12 +36,22 @@ Este comando realizará una serie de preguntas y finalmente creará los archivos
 
 ### 4. Configurar la herramienta
 
+La herramienta cuenta con una interfaz de configuración que puede ser ejecutada con:
+
+```bash
+python src/config.py
+```
+
+Esto abrirá la siguiente ventana que te permitirá cargar una url o una imágen y seleccionar el puerto en el que quieras que corra la herramienta
+
+![Configuración de la herramienta](assets/readme/config.png)
+
 Se debe modificar el archivo [config/config.json](config/config.json) estableciendo el puerto en el que se debe correr y el la url a una imagen o prototipo que se desee utilizar.
 
 ### 5. Correr la herramienta
 
 ```bash
-python app.py
+python src/app.py
 ```
 
 ## Importante

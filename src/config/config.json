@@ -1,5 +1,5 @@
 {
-	"img_path": "null",
-	"prototype_url": "https://usilac.ingenieria.uner.edu.ar/",
-	"port": "null"
+    "url_path": "https://usilac.ingenieria.uner.edu.ar/dashboard/home",
+    "img_path": "null",
+    "port": "5001"
 }
