@@ -204,6 +204,9 @@ if __name__ == "__main__":
 
     with open("src/config/config.json", "r", encoding="utf-8") as config_file:
         config_data = json.load(config_file)
+        print("Configuración:")
+        for key, value in config_data.items():
+            print(f"  - {key}: {value}")
     port_value = config_data.get("port")
     if port_value is None or port_value == "null":  # Check if port is None or "null"
         port = 5001

@@ -8,3 +8,6 @@ dependencies:
   - flask-sqlalchemy=3.1.1
   - flasgger=0.9.7.1
   - numpy=1.26.4
+  - pip
+  - pip:
+    - ttkbootstrap==1.10.1
