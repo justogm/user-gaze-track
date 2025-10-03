@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("/api/config")
     .then((response) => response.json())
     .then((config) => {
-      const prototypeUrl = config.prototype_url;
+      const prototypeUrl = config.url_path;
       const imgPath = config.img_path;
 
       // Validar que uno de los dos esté configurado y no ambos
@@ -185,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
         (!imgPath || imgPath === "null")
       ) {
         console.error(
-          "Error: Ambos valores son nulos. Debe configurarse 'prototype_url' o 'img_path'."
+          "Error: Ambos valores son nulos. Debe configurarse 'url_path' o 'img_path'."
         );
         alert(
           "Error: No se ha configurado correctamente el prototipo o la imagen."
