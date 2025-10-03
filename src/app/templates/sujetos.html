@@ -17,6 +17,7 @@
 					<th scope="col", style="border: 1px solid black; padding: 8px;">Nombre</th>
 					<th scope="col", style="border: 1px solid black; padding: 8px;">Edad</th>
 					<th scope="col", style="border: 1px solid black; padding: 8px;">Resultados</th>
+					<th scope="col", style="border: 1px solid black; padding: 8px;">Visualización</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -27,6 +28,9 @@
 						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.edad }} años</td>
 						<td style="border: 1px solid black; padding: 8px;">
 							<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-link">Ver Resultados</a>
+						</td>
+						<td style="border: 1px solid black; padding: 8px;">
+							<a href="{{ url_for('visualizacion', id=sujeto.id) }}" class="btn btn-link">Ver Animaciones</a>
 						</td>
 					</tr>
 				{% endfor %}

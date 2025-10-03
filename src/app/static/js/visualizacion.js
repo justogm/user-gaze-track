@@ -36,11 +36,16 @@ async function cargarDatos() {
         }));
 
         let mouseLayout = {
-            title: `Movimiento del Mouse (Sujeto ${sujetoId})`,
+            title: {
+                text: `Movimiento del Mouse (Sujeto ${sujetoId})`,
+                font: { size: 18 },
+                x: 0.5,
+                xanchor: 'center'
+            },
             xaxis: { range: [0, 1920], title: "X", fixedrange: true },
             yaxis: { range: [0, 1080], title: "Y", scaleanchor: "x", fixedrange: true },
             width: 700,
-            height: 400,
+            height: 500,
             updatemenus: [{
                 type: "buttons",
                 showactive: false,
@@ -99,11 +104,16 @@ async function cargarDatos() {
         }));
 
         let gazeLayout = {
-            title: `Movimiento de la Mirada (Sujeto ${sujetoId})`,
+            title: {
+                text: `Movimiento de la Mirada (Sujeto ${sujetoId})`,
+                font: { size: 18 },
+                x: 0.5,
+                xanchor: 'center'
+            },
             xaxis: { range: [0, 1920], title: "X" ,fixedrange: true},
             yaxis: { range: [0, 1080], title: "Y", scaleanchor: "x", fixedrange: true },
             width: 700,
-            height: 400,
+            height: 500,
             updatemenus: [{
                 type: "buttons",
                 showactive: false,
