@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from tkinter import filedialog, messagebox
@@ -59,6 +60,15 @@ def save_config():
 
     app.destroy()
 
+def open_task_editor():
+    """Abrir el editor de tareas"""
+    try:
+        script_dir = os.path.dirname(__file__)
+        task_editor_path = os.path.join(script_dir, "task_editor.py")
+        subprocess.run(["python", task_editor_path], check=True)
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudo abrir el editor de tareas: {e}")
+
 def select_image():
     filename = filedialog.askopenfilename(
         title="Seleccionar imagen",
@@ -105,6 +115,10 @@ ttk.Entry(frame, textvariable=port_var, width=10).grid(row=2, column=1, padx=10,
 # Botón guardar centrado
 ttk.Button(frame, text="Guardar Configuración", bootstyle="success", command=save_config)\
     .grid(row=3, column=0, columnspan=3, pady=20)
+
+# Botón para editor de tareas
+ttk.Button(frame, text="Editor de Tareas", bootstyle="info", command=open_task_editor)\
+    .grid(row=4, column=0, columnspan=3, pady=10)
 
 # -------- Excluyente dinámico --------
 def on_url_change(*args):
