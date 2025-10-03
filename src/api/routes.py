@@ -4,6 +4,7 @@ API routes for the user gaze tracking application.
 
 from flask import Blueprint, request, jsonify, send_file, send_from_directory
 from .services import SubjectService, MeasurementService, TaskLogService, ExportService
+import os
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -158,7 +159,8 @@ def config():
         200:
             description: Configuration file.
     """
-    return send_from_directory("config", "config.json")
+    config_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config")
+    return send_from_directory(config_dir, "config.json")
 
 
 @api_bp.route("/tasks")
