@@ -19,39 +19,10 @@ git clone https://github.com/justogm/user-gaze-track.git
 cd user-gaze-track
 ```
 
-### 2. Instala los requerimientos
+### 2. Correr la herramienta
 
 ```bash
-pip install -r requirements.txt
-```
-
-### 3. Generar certificados
-Para poder utilizar el módulo de gaze tracking debe soportar https. Por ello, deben crearse las credenciales para que funcione correctamente.
-
-```bash
-openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-```
-
-Este comando realizará una serie de preguntas y finalmente creará los archivos *cert.pem* y *key.pem* que utilizará Flask.
-
-### 4. Configurar la herramienta
-
-La herramienta cuenta con una interfaz de configuración que puede ser ejecutada con:
-
-```bash
-python src/config.py
-```
-
-Esto abrirá la siguiente ventana que te permitirá cargar una url o una imágen y seleccionar el puerto en el que quieras que corra la herramienta
-
-![Configuración de la herramienta](assets/readme/config.png)
-
-Se debe modificar el archivo [config/config.json](config/config.json) estableciendo el puerto en el que se debe correr y el la url a una imagen o prototipo que se desee utilizar.
-
-### 5. Correr la herramienta
-
-```bash
-python src/app.py
+python run.py
 ```
 
 ## Importante
