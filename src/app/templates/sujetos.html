@@ -24,8 +24,8 @@
 				{% for sujeto in sujetos %}
 					<tr>
 						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.id }}</td>
-						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.nombre }} {{ sujeto.apellido }}</td>
-						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.edad }} años</td>
+						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.name }} {{ sujeto.surname }}</td>
+						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.age }} años</td>
 						<td style="border: 1px solid black; padding: 8px;">
 							<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-link">Ver Resultados</a>
 						</td>

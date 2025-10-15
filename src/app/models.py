@@ -3,74 +3,72 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-class Sujeto(db.Model):
+class Subject(db.Model):
+    __tablename__ = 'subject'
+    
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    apellido = db.Column(db.String(50), nullable=False)
-    edad = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    surname = db.Column(db.String(50), nullable=False)
+    age = db.Column(db.Integer, nullable=False)
 
 
-class Medicion(db.Model):
-    """
-    Representa una medición asociada a un sujeto, con puntos específicos para mouse y gaze.
-    """
+class Measurement(db.Model):
+    """Represents a measurement associated with a subject, with specific points for mouse and gaze."""
+    
+    __tablename__ = 'measurement'
 
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime, nullable=False)
-    sujeto_id = db.Column(db.Integer, db.ForeignKey("sujeto.id"), nullable=False)
-    punto_mouse_id = db.Column(db.Integer, db.ForeignKey("punto.id"), nullable=True)
-    punto_gaze_id = db.Column(db.Integer, db.ForeignKey("punto.id"), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
+    mouse_point_id = db.Column(db.Integer, db.ForeignKey("point.id"), nullable=True)
+    gaze_point_id = db.Column(db.Integer, db.ForeignKey("point.id"), nullable=True)
 
-    punto_mouse = db.relationship("Punto", foreign_keys=[punto_mouse_id])
-    punto_gaze = db.relationship("Punto", foreign_keys=[punto_gaze_id])
+    mouse_point = db.relationship("Point", foreign_keys=[mouse_point_id])
+    gaze_point = db.relationship("Point", foreign_keys=[gaze_point_id])
 
     def __str__(self):
-        return f"Medicion {self.id} - Fecha: {self.fecha}"
+        return f"Measurement {self.id} - Date: {self.date}"
 
     def __json__(self):
         return {
             "id": self.id,
-            "fecha": self.fecha.isoformat(),
-            "punto_mouse": self.punto_mouse.__json__() if self.punto_mouse else None,
-            "punto_gaze": self.punto_gaze.__json__() if self.punto_gaze else None,
+            "date": self.date.isoformat(),
+            "mouse_point": self.mouse_point.__json__() if self.mouse_point else None,
+            "gaze_point": self.gaze_point.__json__() if self.gaze_point else None,
         }
 
 
-class Punto(db.Model):
-    """
-    Representa un punto genérico en el espacio (x, y).
-    """
+class Point(db.Model):
+    """Represents a generic point in space (x, y)."""
+    
+    __tablename__ = 'point'
 
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, nullable=False)
     y = db.Column(db.Float, nullable=False)
 
     def __str__(self):
-        return f"Punto ({self.x}, {self.y})"
+        return f"Point ({self.x}, {self.y})"
 
     def __json__(self):
         return {"x": self.x, "y": self.y}
 
 
 class TaskLog(db.Model):
-    """
-    Representa un registro de una tarea realizada por un sujeto.
-    """
+    """Represents a log of a task performed by a subject."""
+    
+    __tablename__ = 'task_log'
 
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=True)
-    response = db.Column(
-        db.String(255), nullable=True
-    )  # Puede ser NULL si se omitió la tarea
-    sujeto_id = db.Column(db.Integer, db.ForeignKey("sujeto.id"), nullable=False)
+    response = db.Column(db.String(255), nullable=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey("subject.id"), nullable=False)
 
-    sujeto = db.relationship("Sujeto", backref=db.backref("task_logs", lazy=True))
+    subject = db.relationship("Subject", backref=db.backref("task_logs", lazy=True))
 
     def __str__(self):
-        return (
-            f"TaskLog {self.id} - Sujeto: {self.sujeto_id} - Inicio: {self.start_time}"
-        )
+        return f"TaskLog {self.id} - Subject: {self.subject_id} - Start: {self.start_time}"
 
     def __json__(self):
         return {
@@ -78,5 +76,5 @@ class TaskLog(db.Model):
             "start_time": self.start_time.isoformat(),
             "end_time": self.end_time.isoformat() if self.end_time else None,
             "response": self.response,
-            "sujeto_id": self.sujeto_id,
+            "subject_id": self.subject_id,
         }

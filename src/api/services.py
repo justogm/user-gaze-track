@@ -7,7 +7,7 @@ import csv
 import io
 from datetime import datetime
 import numpy as np
-from app.models import db, Sujeto, Punto, Medicion, TaskLog
+from app.models import db, Subject, Point, Measurement, TaskLog
 
 
 class SubjectService:
@@ -16,13 +16,13 @@ class SubjectService:
     @staticmethod
     def get_all_subjects():
         """Get all subjects with their basic information."""
-        subjects = Sujeto.query.all()
+        subjects = Subject.query.all()
         return [
             {
                 "id": subject.id,
-                "name": subject.nombre,
-                "surname": subject.apellido,
-                "age": subject.edad,
+                "name": subject.name,
+                "surname": subject.surname,
+                "age": subject.age,
             }
             for subject in subjects
         ]
@@ -30,7 +30,7 @@ class SubjectService:
     @staticmethod
     def get_subject_by_id(subject_id):
         """Get a subject by its ID."""
-        return Sujeto.query.filter_by(id=subject_id).first()
+        return Subject.query.filter_by(id=subject_id).first()
 
 
 class MeasurementService:
@@ -45,23 +45,23 @@ class MeasurementService:
         for point in points:
             date = datetime.strptime(point["date"], "%m/%d/%Y, %I:%M:%S %p")
 
-            gaze_point = Punto(
+            gaze_point = Point(
                 x=point["gaze"]["x"],
                 y=point["gaze"]["y"],
             )
             db.session.add(gaze_point)
 
-            mouse_point = Punto(
+            mouse_point = Point(
                 x=point["mouse"]["x"],
                 y=point["mouse"]["y"],
             )
             db.session.add(mouse_point)
 
-            new_measurement = Medicion(
-                fecha=date,
-                sujeto_id=subject_id,
-                punto_gaze=gaze_point,
-                punto_mouse=mouse_point,
+            new_measurement = Measurement(
+                date=date,
+                subject_id=subject_id,
+                gaze_point=gaze_point,
+                mouse_point=mouse_point,
             )
             db.session.add(new_measurement)
 
@@ -76,20 +76,20 @@ class MeasurementService:
         if not subject:
             return None
 
-        measurements = Medicion.query.filter_by(sujeto_id=subject.id).all()
+        measurements = Measurement.query.filter_by(subject_id=subject.id).all()
 
         points = []
         for measurement in measurements:
             point = {
-                "date": measurement.fecha.strftime("%Y-%m-%d %H:%M:%S"),
+                "date": measurement.date.strftime("%Y-%m-%d %H:%M:%S"),
                 "x_mouse": (
-                    measurement.punto_mouse.x if measurement.punto_mouse else None
+                    measurement.mouse_point.x if measurement.mouse_point else None
                 ),
                 "y_mouse": (
-                    measurement.punto_mouse.y if measurement.punto_mouse else None
+                    measurement.mouse_point.y if measurement.mouse_point else None
                 ),
-                "x_gaze": measurement.punto_gaze.x if measurement.punto_gaze else None,
-                "y_gaze": measurement.punto_gaze.y if measurement.punto_gaze else None,
+                "x_gaze": measurement.gaze_point.x if measurement.gaze_point else None,
+                "y_gaze": measurement.gaze_point.y if measurement.gaze_point else None,
             }
             points.append(point)
 
@@ -114,7 +114,7 @@ class TaskLogService:
                     else None
                 ),
                 response=log["response"],
-                sujeto_id=subject_id,
+                subject_id=subject_id,
             )
             db.session.add(new_log)
 
@@ -129,7 +129,7 @@ class TaskLogService:
         if not subject:
             return None
 
-        task_logs = TaskLog.query.filter_by(sujeto_id=subject.id).all()
+        task_logs = TaskLog.query.filter_by(subject_id=subject.id).all()
         task_logs_info = [
             {
                 "start_time": log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -154,22 +154,20 @@ class ExportService:
         if not subject:
             return None
 
-        measurements = Medicion.query.filter_by(sujeto_id=subject.id).all()
+        measurements = Measurement.query.filter_by(subject_id=subject.id).all()
 
         si = io.StringIO()
         csv_writer = csv.writer(si)
 
-        # Write headers
         csv_writer.writerow(["date", "x_mouse", "y_mouse", "x_gaze", "y_gaze"])
 
-        # Write rows
         for measurement in measurements:
             row = [
-                measurement.fecha.strftime("%Y-%m-%d %H:%M:%S"),
-                measurement.punto_mouse.x if measurement.punto_mouse else None,
-                measurement.punto_mouse.y if measurement.punto_mouse else None,
-                measurement.punto_gaze.x if measurement.punto_gaze else None,
-                measurement.punto_gaze.y if measurement.punto_gaze else None,
+                measurement.date.strftime("%Y-%m-%d %H:%M:%S"),
+                measurement.mouse_point.x if measurement.mouse_point else None,
+                measurement.mouse_point.y if measurement.mouse_point else None,
+                measurement.gaze_point.x if measurement.gaze_point else None,
+                measurement.gaze_point.y if measurement.gaze_point else None,
             ]
             csv_writer.writerow(row)
 
@@ -187,13 +185,10 @@ class ExportService:
         si = io.StringIO()
         csv_writer = csv.writer(si)
 
-        # Write headers
         csv_writer.writerow(["start_time", "end_time", "response"])
 
-        # Get task logs for the subject
-        task_logs = TaskLog.query.filter_by(sujeto_id=subject_id).all()
+        task_logs = TaskLog.query.filter_by(subject_id=subject_id).all()
 
-        # Write rows
         for log in task_logs:
             row = [
                 log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -208,7 +203,7 @@ class ExportService:
     @staticmethod
     def export_all_points_csv():
         """Export measurement points for all subjects as CSV."""
-        all_subjects = Sujeto.query.all()
+        all_subjects = Subject.query.all()
 
         if len(all_subjects) == 0:
             return None
@@ -218,7 +213,7 @@ class ExportService:
         csv_writer.writeheader()
 
         for subject in all_subjects:
-            points = Punto.query.filter_by(sujeto_id=subject.id).all()
+            points = Point.query.filter_by(subject_id=subject.id).all()
             points_dict = [point.__json__() for point in points]
 
             subject_id = int(subject.id)

@@ -84,10 +84,7 @@
       });
 
       window.onload = function() {
-      // Convertir el arreglo de puntos de Python a un arreglo de JavaScript
       var puntosOriginales = {{ puntos|tojson }};
-
-      // console.log('Puntos', puntosOriginales);
 
       fetch("/api/config")
       .then((response) => response.json())
@@ -95,7 +92,6 @@
         const prototypeUrl = config.url_path;
         const imgPath = config.img_path;
 
-        // Validar que uno de los dos esté configurado y no ambos
         if (
           (!prototypeUrl || prototypeUrl === "null") &&
           (!imgPath || imgPath === "null")
@@ -110,37 +106,32 @@
         }
 
         if (prototypeUrl && prototypeUrl !== "null") {
-          // Mostrar el iframe del prototipo
           console.log(prototypeUrl);
           const iframe = document.getElementById("prototype");
           iframe.src = prototypeUrl;
           iframe.style.display = "block";
         } else if (imgPath && imgPath !== "null") {
-          // Mostrar la imagen
           const imgElement = document.getElementById("img_interes");
           imgElement.src = imgPath;
           imgElement.style.display = "block";
         }
 
-        // Ajusta las coordenadas
         var puntos = puntosOriginales.map(punto => ({
-          x: punto.x + Math.abs(Math.min(0, punto.x)), // Asegúrate de que el x sea positivo
-          y: punto.y + Math.abs(Math.min(0, punto.y))  // Asegúrate de que el y sea positivo
+          x: punto.x + Math.abs(Math.min(0, punto.x)),
+          y: punto.y + Math.abs(Math.min(0, punto.y))
         }));
         var data = {
-          max: 10, // Ajusta este valor para ver más intensidad
+          max: 10,
           min: 0,
           data: puntos.map(punto => ({
             x: parseFloat(punto.x),
             y: parseFloat(punto.y),
-            value: 5 // Puedes cambiarlo para diferentes intensidades
+            value: 5
           }))
         };
 
-        // Comprobando los puntos
         console.log('Puntos:', puntos);
 
-        // Configurando heatmap
         console.log('Configurando heatmap con los siguientes datos:', data);
         var heatmapInstance = h337.create({
           container: document.querySelector('.heatmap')
