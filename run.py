@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script multiplataforma para configurar y ejecutar User Gaze Track
-Uso: python run.py [--venv]
+Cross-platform script to configure and run User Gaze Track
+Usage: python run.py [--venv]
 """
 
 import subprocess
@@ -24,11 +24,11 @@ class GazeTrackRunner:
         self.key_file = "key.pem"
         
     def print_step(self, message, emoji="🔧"):
-        """Imprime un mensaje con formato"""
+        """Print a formatted message"""
         print(f"{emoji} {message}")
         
     def run_command(self, command, shell=True, check=True, capture_output=False):
-        """Ejecuta un comando del sistema"""
+        """Run a system command"""
         try:
             if capture_output:
                 result = subprocess.run(command, shell=shell, check=check, 
@@ -40,28 +40,28 @@ class GazeTrackRunner:
         except subprocess.CalledProcessError as e:
             if capture_output:
                 return None
-            print(f"❌ Error ejecutando comando: {command}")
+            print(f"❌ Error running command: {command}")
             print(f"   {e}")
             return False
             
     def command_exists(self, command):
-        """Verifica si un comando está disponible"""
+        """Check if a command is available"""
         return shutil.which(command) is not None
         
     def detect_environment_manager(self, force_venv=False):
-        """Detecta qué gestor de entornos usar"""
+        """Detects whether to use conda or venv"""
         if force_venv:
-            self.print_step("Forzando el uso de Python venv...")
+            self.print_step("Forcing use of Python venv...")
             self.use_conda = False
         elif self.command_exists("conda"):
-            self.print_step("Conda detectado. Usando conda para gestión de entornos...", "🐍")
+            self.print_step("Conda detected. Using conda for environment management...", "🐍")
             self.use_conda = True
         else:
-            self.print_step("Conda no disponible. Usando Python venv como fallback...", "⚠️")
+            self.print_step("Conda not available. Using Python venv as fallback...", "⚠️")
             self.use_conda = False
             
     def conda_env_exists(self):
-        """Verifica si el entorno conda existe"""
+        """Check if the conda environment exists"""
         try:
             output = self.run_command("conda env list", capture_output=True)
             if output:
@@ -73,18 +73,18 @@ class GazeTrackRunner:
             return False
             
     def setup_conda_environment(self):
-        """Configura el entorno con conda"""
+        """Set up the conda environment"""
         if self.conda_env_exists():
-            self.print_step(f"El entorno conda '{self.env_name}' ya existe.", "✅")
+            self.print_step(f"Conda environment '{self.env_name}' already exists.", "✅")
         else:
-            self.print_step(f"Creando el entorno conda '{self.env_name}' desde environment.yml...", "⚙️")
+            self.print_step(f"Creating conda environment '{self.env_name}' from environment.yml...", "⚙️")
             if not self.run_command(f"conda env create -n {self.env_name} -f environment.yml"):
                 return False
-            self.print_step(f"Entorno conda '{self.env_name}' creado.", "✅")
+            self.print_step(f"Conda environment '{self.env_name}' created.", "✅")
         return True
         
     def get_conda_python(self):
-        """Obtiene la ruta del Python del entorno conda"""
+        """Get the path to the Python executable inside the conda environment"""
         try:
             # Obtener la ruta base de conda
             conda_info = self.run_command("conda info --base", capture_output=True)
@@ -99,29 +99,29 @@ class GazeTrackRunner:
             return None
             
     def setup_venv_environment(self):
-        """Configura el entorno con venv"""
+        """Set up the venv-based environment"""
         venv_path = Path(self.venv_dir)
         venv_exists = venv_path.exists()
         
         if venv_exists:
-            self.print_step(f"El entorno virtual '{self.venv_dir}' ya existe.", "✅")
+            self.print_step(f"Virtual environment '{self.venv_dir}' already exists.", "✅")
         else:
-            self.print_step(f"Creando entorno virtual Python '{self.venv_dir}'...", "⚙️")
+            self.print_step(f"Creating Python virtual environment '{self.venv_dir}'...", "⚙️")
             if not self.run_command(f"python -m venv {self.venv_dir}"):
                 return False
-            self.print_step(f"Entorno virtual '{self.venv_dir}' creado.", "✅")
+            self.print_step(f"Virtual environment '{self.venv_dir}' created.", "✅")
             
         return True, not venv_exists
         
     def get_venv_python(self):
-        """Obtiene la ruta del Python del entorno virtual"""
+        """Get the path to the Python executable inside the venv"""
         if self.is_windows:
             return str(Path(self.venv_dir) / "Scripts" / "python.exe")
         else:
             return str(Path(self.venv_dir) / "bin" / "python")
             
     def check_flask_installed(self, python_path):
-        """Verifica si Flask está instalado"""
+        """Check if Flask is installed"""
         try:
             result = self.run_command(f'"{python_path}" -c "import flask"', capture_output=True)
             return result is not None
@@ -129,43 +129,43 @@ class GazeTrackRunner:
             return False
             
     def check_certificates_exist(self):
-        """Verifica si los certificados SSL existen"""
+        """Check if SSL certificates exist"""
         cert_exists = Path(self.cert_file).exists()
         key_exists = Path(self.key_file).exists()
         
         if cert_exists and key_exists:
-            self.print_step("Certificados SSL encontrados.", "🔐")
+            self.print_step("SSL certificates found.", "🔐")
             # Mostrar información adicional sobre los certificados
             try:
                 cert_stat = Path(self.cert_file).stat()
                 cert_date = datetime.fromtimestamp(cert_stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
-                self.print_step(f"  - Certificado creado: {cert_date}")
+                self.print_step(f"  - Certificate created: {cert_date}")
             except:
                 pass
             return True
         elif cert_exists or key_exists:
-            self.print_step("Solo uno de los certificados existe. Se recrearán ambos.", "⚠️")
+            self.print_step("Only one of the certificates exists. Both will be recreated.", "⚠️")
             return False
         else:
-            self.print_step("Certificados SSL no encontrados.", "❌")
+            self.print_step("SSL certificates not found.", "❌")
             return False
             
     def install_cryptography(self, python_path):
-        """Instala la librería cryptography si no está disponible"""
+        """Install the cryptography library if not available"""
         try:
             self.run_command(f'"{python_path}" -c "import cryptography"', capture_output=True)
             return True
         except:
-            self.print_step("Instalando cryptography para generar certificados...", "📦")
+            self.print_step("Installing cryptography to generate certificates...", "📦")
             return self.run_command(f'"{python_path}" -m pip install cryptography')
             
     def create_ssl_certificates(self, python_path):
-        """Crea certificados SSL autofirmados usando Python/cryptography"""
+        """Create self-signed SSL certificates using Python/cryptography"""
         if not self.install_cryptography(python_path):
-            print("❌ Error al instalar cryptography")
+            print("❌ Error installing cryptography")
             return False
             
-        self.print_step("Generando certificados SSL autofirmados...", "🔐")
+        self.print_step("Generating self-signed SSL certificates...", "🔐")
         
         # Script Python para generar certificados
         cert_script = '''
@@ -183,7 +183,7 @@ private_key = rsa.generate_private_key(
     key_size=2048,
 )
 
-# Configurar el certificado
+# Configure the certificate
 subject = issuer = x509.Name([
     x509.NameAttribute(NameOID.COUNTRY_NAME, "ES"),
     x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Madrid"),
@@ -193,7 +193,7 @@ subject = issuer = x509.Name([
     x509.NameAttribute(NameOID.COMMON_NAME, "localhost"),
 ])
 
-# Usar datetime con timezone-aware para evitar deprecation warning
+# Use timezone-aware datetime to avoid deprecation warning
 try:
     # Python 3.12+
     now = datetime.now(datetime.UTC)
@@ -202,7 +202,7 @@ except AttributeError:
     from datetime import timezone
     now = datetime.now(timezone.utc)
 
-# Crear el certificado
+# Create the certificate
 cert = x509.CertificateBuilder().subject_name(
     subject
 ).issuer_name(
@@ -225,7 +225,7 @@ cert = x509.CertificateBuilder().subject_name(
     critical=False,
 ).sign(private_key, hashes.SHA256())
 
-# Guardar la clave privada
+# Save the private key
 with open("key.pem", "wb") as f:
     f.write(private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
@@ -233,7 +233,7 @@ with open("key.pem", "wb") as f:
         encryption_algorithm=serialization.NoEncryption()
     ))
 
-# Guardar el certificado
+# Save the certificate
 with open("cert.pem", "wb") as f:
     f.write(cert.public_bytes(serialization.Encoding.PEM))
 
@@ -250,9 +250,9 @@ print("- key.pem (clave privada)")
             
             if self.run_command(f'"{python_path}" {script_path}'):
                 os.remove(script_path)
-                self.print_step("Certificados SSL creados exitosamente.", "✅")
-                self.print_step("  - cert.pem (certificado público)")
-                self.print_step("  - key.pem (clave privada)")
+                self.print_step("SSL certificates created successfully.", "✅")
+                self.print_step("  - cert.pem (public certificate)")
+                self.print_step("  - key.pem (private key)")
                 return True
             else:
                 if os.path.exists(script_path):
@@ -266,35 +266,35 @@ print("- key.pem (clave privada)")
             return False
             
     def setup_ssl_certificates(self, python_path):
-        """Configura los certificados SSL (detecta o crea si es necesario)"""
+        """Set up SSL certificates (detect or create if necessary)"""
         if not self.check_certificates_exist():
             try:
-                create = input("¿Desea crear certificados SSL autofirmados? (s/n): ")
+                create = input("Do you want to create self-signed SSL certificates? (y/n): ")
                 if create.lower() in ['s', 'sí', 'si', 'y', 'yes']:
                     if not self.create_ssl_certificates(python_path):
-                        print("❌ Error al crear los certificados SSL")
-                        print("   La aplicación se ejecutará sin HTTPS")
+                        print("❌ Error creating SSL certificates")
+                        print("   The application will run without HTTPS")
                         return False
                 else:
-                    self.print_step("Certificados SSL no creados.", "⚠️")
-                    self.print_step("La aplicación se ejecutará sin HTTPS.", "⚠️")
+                    self.print_step("SSL certificates not created.", "⚠️")
+                    self.print_step("The application will run without HTTPS.", "⚠️")
                     return False
             except KeyboardInterrupt:
-                print("\n❌ Cancelado por el usuario")
+                print("\n❌ Cancelled by user")
                 return False
         return True
             
     def install_dependencies(self, python_path):
-        """Instala las dependencias del proyecto"""
-        self.print_step("Instalando dependencias...", "📦")
+        """Install project dependencies"""
+        self.print_step("Installing dependencies...", "📦")
         
         requirements_file = Path("requirements.txt")
         if requirements_file.exists() and requirements_file.stat().st_size > 0:
-            self.print_step("   Desde requirements.txt...")
+            self.print_step("   From requirements.txt...")
             if not self.run_command(f'"{python_path}" -m pip install -r requirements.txt'):
                 return False
         else:
-            self.print_step("   Dependencias básicas...")
+            self.print_step("   Installing core dependencies...")
             deps = [
                 "flask==3.1.0",
                 "flask-sqlalchemy==3.1.1", 
@@ -307,33 +307,33 @@ print("- key.pem (clave privada)")
                 if not self.run_command(f'"{python_path}" -m pip install {dep}'):
                     return False
                     
-        self.print_step("Dependencias instaladas.", "✅")
-        return True
+            self.print_step("Dependencies installed.", "✅")
+            return True
         
     def ask_for_configuration(self, python_path):
-        """Pregunta si el usuario quiere configurar la aplicación"""
+        """Ask whether the user wants to configure the application"""
         print()
         try:
-            choice = input("¿Desea modificar las configuraciones antes de ejecutar la aplicación? (s/n): ")
+            choice = input("Do you want to modify configurations before running the application? (y/n): ")
             if choice.lower() in ['s', 'sí', 'si', 'y', 'yes']:
-                self.print_step("Abriendo configurador...", "⚙️")
+                self.print_step("Opening configurator...", "⚙️")
                 if self.run_command(f'"{python_path}" src/config.py'):
-                    self.print_step("Configuración completada.", "✅")
+                    self.print_step("Configuration completed.", "✅")
                 else:
-                    print("❌ Error al abrir el configurador")
+                    print("❌ Error opening configurator")
                     return False
         except KeyboardInterrupt:
-            print("\n❌ Cancelado por el usuario")
+            print("\n❌ Cancelled by user")
             return False
         return True
         
     def run_application(self, python_path):
-        """Ejecuta la aplicación principal"""
-        self.print_step("Ejecutando la aplicación...", "🚀")
+        """Run the main application"""
+        self.print_step("Running the application...", "🚀")
         return self.run_command(f'"{python_path}" src/app.py')
         
     def run(self):
-        """Método principal que ejecuta todo el flujo"""
+        """Main method that runs the full setup and execution flow"""
         # Detectar argumentos
         force_venv = "--venv" in sys.argv
         
@@ -347,7 +347,7 @@ print("- key.pem (clave privada)")
                 
             python_path = self.get_conda_python()
             if not python_path:
-                print("❌ No se pudo obtener la ruta del Python de conda")
+                print("❌ Could not get the conda Python path")
                 sys.exit(1)
                 
             # Verificar que cryptography esté disponible para conda
@@ -366,12 +366,12 @@ print("- key.pem (clave privada)")
                 if not self.install_dependencies(python_path):
                     sys.exit(1)
             else:
-                self.print_step("Dependencias ya instaladas, omitiendo instalación.", "✅")
+                self.print_step("Dependencies already installed, skipping installation.", "✅")
                 
         # Configurar certificados SSL
         self.setup_ssl_certificates(python_path)
                 
-        # Configuración opcional
+        # Optional configuration
         if not self.ask_for_configuration(python_path):
             sys.exit(1)
             
@@ -385,8 +385,8 @@ if __name__ == "__main__":
         runner = GazeTrackRunner()
         runner.run()
     except KeyboardInterrupt:
-        print("\n❌ Ejecución cancelada por el usuario")
+        print("\n❌ Execution cancelled by user")
         sys.exit(1)
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        print(f"❌ Unexpected error: {e}")
         sys.exit(1)

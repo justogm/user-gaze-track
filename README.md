@@ -1,14 +1,14 @@
-# Herramienta de Seguimiento de Interacciones del Usuario con Prototipos
+# User Gaze Tracking Tool for Prototypes
 
-Esta aplicación web utiliza Flask como backend para gestionar la entrada de datos y WebGazer.js en el frontend para realizar el seguimiento de la vista del usuario. El flujo básico de la aplicación es el siguiente:
+This web application uses Flask as the backend to handle data entry and WebGazer.js in the frontend to perform user gaze tracking. The basic application flow is as follows:
 
-1. **Página de Inicio (/):** Aquí encontrarás un formulario de entrada de datos. Los usuarios deben completar el formulario y hacer clic en "Submit" para avanzar.
+1. **Home Page (/):** Contains a data entry form. Users should fill the form and click "Submit" to proceed.
 
-2. **Página de Gaze Tracking:** Después de enviar el formulario, serás redirigido a una página donde se iniciará el seguimiento de la vista mediante WebGazer.js. La página pasará por una fase de calibración con una serie de botones y luego mostrará un prototipo de Figma para registrar el comportamiento de la vista del usuario. Los datos obtenidos se irán registrando en una base de datos de SQLite (puede luego cambiarse, esta fue seleccioanda por conveniencia para el desarrollo).
+2. **Gaze Tracking Page:** After submitting the form, you will be redirected to a page where gaze tracking starts using WebGazer.js. The page includes a calibration phase with a series of buttons and then displays a Figma prototype to record the user's gaze behavior. The collected data is stored in a SQLite database (this can be changed later; SQLite was chosen for convenience during development).
 
-3. **Página de sujetos (/sujetos):** Se pueden ver los sujetos presentes en la base de datos. Se puede acceder a la información de cada sujeto y ver los datos de seguimiento de la vista.
+3. **Subjects Page (/sujetos):** View the subjects stored in the database. You can access each subject's details and gaze tracking data.
 
-4. **Página de resultados para un sujeto (/resultados?id={sujeto}):** Se puede ver el heatmap de la mirada de un sujeto y descargar sus datos en formato csv.
+4. **Results Page for a subject (/resultados?id={sujeto}):** View the gaze heatmap for a subject and download their data as CSV.
 
 ## Uso del Proyecto
 
@@ -19,7 +19,7 @@ git clone https://github.com/justogm/user-gaze-track.git
 cd user-gaze-track
 ```
 
-### 2. Correr la herramienta
+### 2. Run the tool
 
 ```bash
 python run.py
@@ -45,21 +45,21 @@ Puede ser modificado de acuerdo a las variables que se consideren relevantes.
 
 ![Data Entry](assets/readme/data-entry.png)
 
-### 2. Etapa de calibración e instrucciones
+### 2. Calibration and instructions
 
-![Calibración e instrucciones](assets/readme/instrucciones-y-calibracion.png)
+![Calibration and instructions](assets/readme/instrucciones-y-calibracion.png)
 
-*La imagen de instrucciones para la calibración es la proporcionada por el módulo, sería conveniente crear una que se encuentre traducida al español.*
+*The calibration instructions image is provided by the module; consider creating a translated version if needed.*
 
-### 3. Presentación del prototipo
+### 3. Prototype presentation
 
-![Presentación del prototipo](assets/readme/prototipo-figma.png)
+![Prototype presentation](assets/readme/prototipo-figma.png)
 
 ## TODO
 
-- [ ] Evaluar comportamiento del modulo en caso de tener el prototipo en pantalla completa.
-- [ ] Analizar alternativas para la presentación del prototipo.
-- [x] Facilitar el cambio del prototipo, no dejarlo hardcodeado.
-  - Se crea archivo de configuración, ver [sección de configuración](#4-configurar-la-herramienta).
-- [x] Desarrollar una app paralela para el acceso a los datos generados y su manipulación.
-  - Se desarrolló la ruta `/sujetos`
+- [ ] Evaluate module behavior when the prototype is in fullscreen mode.
+- [ ] Explore alternatives for prototype presentation.
+- [x] Make it easier to change the prototype instead of leaving it hardcoded.
+  - A configuration file was created; see the [configuration section](#4-configure-the-tool).
+- [x] Develop a parallel app for accessing and manipulating generated data.
+  - The route `/sujetos` was developed
