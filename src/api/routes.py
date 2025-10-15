@@ -8,6 +8,12 @@ import os
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
+# Initialize service instances
+subject_service = SubjectService()
+measurement_service = MeasurementService()
+tasklog_service = TaskLogService()
+export_service = ExportService()
+
 
 @api_bp.route("/get-subjects", methods=["GET"])
 def api_subjects():
@@ -18,7 +24,7 @@ def api_subjects():
         200:
             description: JSON with subjects information.
     """
-    subjects_info = SubjectService.get_all_subjects()
+    subjects_info = subject_service.get_all_subjects()
     return jsonify(subjects_info)
 
 
@@ -41,7 +47,7 @@ def get_user_points():
     """
     subject_id = request.args.get("id", type=int)
 
-    result = MeasurementService.get_user_points(subject_id)
+    result = measurement_service.get_user_points(subject_id)
     if result:
         return jsonify(result)
     return "Subject not found", 404
@@ -66,7 +72,7 @@ def get_user_tasklogs():
     """
     subject_id = request.args.get("id", type=int)
 
-    result = TaskLogService.get_user_tasklogs(subject_id)
+    result = tasklog_service.get_user_tasklogs(subject_id)
     if result:
         return jsonify(result)
     return "Subject not found", 404
@@ -113,7 +119,7 @@ def save_points():
             description: status success
     """
     data = request.get_json()
-    result = MeasurementService.save_points(data)
+    result = measurement_service.save_points(data)
     return jsonify(result)
 
 
@@ -146,7 +152,7 @@ def save_tasklogs():
             description: TaskLogs saved successfully.
     """
     data = request.get_json()
-    result = TaskLogService.save_tasklogs(data)
+    result = tasklog_service.save_tasklogs(data)
     return jsonify(result)
 
 
@@ -194,7 +200,7 @@ def download_points():
     """
     subject_id = request.args.get("id", type=int)
 
-    csv_data = ExportService.export_points_csv(subject_id)
+    csv_data = export_service.export_points_csv(subject_id)
     if csv_data:
         return send_file(
             csv_data,
@@ -225,7 +231,7 @@ def download_tasklogs():
     """
     subject_id = request.args.get("id", type=int)
 
-    csv_data = ExportService.export_tasklogs_csv(subject_id)
+    csv_data = export_service.export_tasklogs_csv(subject_id)
     if csv_data:
         return send_file(
             csv_data,
@@ -248,7 +254,7 @@ def download_all():
         404:
             description: No registered subjects.
     """
-    csv_data = ExportService.export_all_points_csv()
+    csv_data = export_service.export_all_points_csv()
     if csv_data:
         return send_file(
             csv_data,

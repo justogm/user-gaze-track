@@ -8,15 +8,23 @@ import io
 from datetime import datetime
 import numpy as np
 from app.models import db, Subject, Point, Measurement, TaskLog
+from repositories import (
+    SubjectRepository,
+    MeasurementRepository,
+    PointRepository,
+    TaskLogRepository
+)
 
 
 class SubjectService:
     """Service class for managing subjects."""
 
-    @staticmethod
-    def get_all_subjects():
+    def __init__(self):
+        self.repository = SubjectRepository()
+
+    def get_all_subjects(self):
         """Get all subjects with their basic information."""
-        subjects = Subject.query.all()
+        subjects = self.repository.get_all_subjects()
         return [
             {
                 "id": subject.id,
@@ -27,17 +35,19 @@ class SubjectService:
             for subject in subjects
         ]
 
-    @staticmethod
-    def get_subject_by_id(subject_id):
+    def get_subject_by_id(self, subject_id):
         """Get a subject by its ID."""
-        return Subject.query.filter_by(id=subject_id).first()
+        return self.repository.get_subject_by_id(subject_id)
 
 
 class MeasurementService:
     """Service class for managing measurements."""
 
-    @staticmethod
-    def save_points(data):
+    def __init__(self):
+        self.repository = MeasurementRepository()
+        self.point_repository = PointRepository()
+
+    def save_points(self, data):
         """Save measurement points to the database."""
         points = data["points"]
         subject_id = data["id"]
@@ -45,38 +55,35 @@ class MeasurementService:
         for point in points:
             date = datetime.strptime(point["date"], "%m/%d/%Y, %I:%M:%S %p")
 
-            gaze_point = Point(
+            gaze_point = self.point_repository.create_point(
                 x=point["gaze"]["x"],
                 y=point["gaze"]["y"],
             )
-            db.session.add(gaze_point)
 
-            mouse_point = Point(
+            mouse_point = self.point_repository.create_point(
                 x=point["mouse"]["x"],
                 y=point["mouse"]["y"],
             )
-            db.session.add(mouse_point)
 
-            new_measurement = Measurement(
+            self.repository.create_measurement(
                 date=date,
                 subject_id=subject_id,
                 gaze_point=gaze_point,
                 mouse_point=mouse_point,
             )
-            db.session.add(new_measurement)
 
-        db.session.commit()
+        self.repository.commit()
         return {"status": "success"}
 
-    @staticmethod
-    def get_user_points(subject_id):
+    def get_user_points(self, subject_id):
         """Get measurement points for a specific subject."""
-        subject = SubjectService.get_subject_by_id(subject_id)
+        subject_service = SubjectService()
+        subject = subject_service.get_subject_by_id(subject_id)
 
         if not subject:
             return None
 
-        measurements = Measurement.query.filter_by(subject_id=subject.id).all()
+        measurements = self.repository.get_measurements_by_subject(subject.id)
 
         points = []
         for measurement in measurements:
@@ -96,17 +103,20 @@ class MeasurementService:
         return {"subject_id": subject_id, "points": points}
 
 
+
 class TaskLogService:
     """Service class for managing task logs."""
 
-    @staticmethod
-    def save_tasklogs(data):
+    def __init__(self):
+        self.repository = TaskLogRepository()
+
+    def save_tasklogs(self, data):
         """Save task logs to the database."""
         task_logs = data["taskLogs"]
         subject_id = data["subject_id"]
 
         for log in task_logs:
-            new_log = TaskLog(
+            self.repository.create_tasklog(
                 start_time=datetime.strptime(log["startTime"], "%m/%d/%Y, %I:%M:%S %p"),
                 end_time=(
                     datetime.strptime(log["endTime"], "%m/%d/%Y, %I:%M:%S %p")
@@ -116,20 +126,19 @@ class TaskLogService:
                 response=log["response"],
                 subject_id=subject_id,
             )
-            db.session.add(new_log)
 
-        db.session.commit()
+        self.repository.commit()
         return {"status": "success", "message": "TaskLogs saved successfully."}
 
-    @staticmethod
-    def get_user_tasklogs(subject_id):
+    def get_user_tasklogs(self, subject_id):
         """Get task logs for a specific subject."""
-        subject = SubjectService.get_subject_by_id(subject_id)
+        subject_service = SubjectService()
+        subject = subject_service.get_subject_by_id(subject_id)
 
         if not subject:
             return None
 
-        task_logs = TaskLog.query.filter_by(subject_id=subject.id).all()
+        task_logs = self.repository.get_tasklogs_by_subject(subject.id)
         task_logs_info = [
             {
                 "start_time": log.start_time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -143,18 +152,23 @@ class TaskLogService:
         return {"subject_id": subject_id, "task_logs": task_logs_info}
 
 
+
 class ExportService:
     """Service class for data export functionality."""
 
-    @staticmethod
-    def export_points_csv(subject_id):
+    def __init__(self):
+        self.subject_repository = SubjectRepository()
+        self.measurement_repository = MeasurementRepository()
+        self.tasklog_repository = TaskLogRepository()
+
+    def export_points_csv(self, subject_id):
         """Export measurement points for a subject as CSV."""
-        subject = SubjectService.get_subject_by_id(subject_id)
+        subject = self.subject_repository.get_subject_by_id(subject_id)
 
         if not subject:
             return None
 
-        measurements = Measurement.query.filter_by(subject_id=subject.id).all()
+        measurements = self.measurement_repository.get_measurements_by_subject(subject.id)
 
         si = io.StringIO()
         csv_writer = csv.writer(si)
@@ -174,10 +188,9 @@ class ExportService:
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))
 
-    @staticmethod
-    def export_tasklogs_csv(subject_id):
+    def export_tasklogs_csv(self, subject_id):
         """Export task logs for a subject as CSV."""
-        subject = SubjectService.get_subject_by_id(subject_id)
+        subject = self.subject_repository.get_subject_by_id(subject_id)
 
         if not subject:
             return None
@@ -187,7 +200,7 @@ class ExportService:
 
         csv_writer.writerow(["start_time", "end_time", "response"])
 
-        task_logs = TaskLog.query.filter_by(subject_id=subject_id).all()
+        task_logs = self.tasklog_repository.get_tasklogs_by_subject(subject_id)
 
         for log in task_logs:
             row = [
@@ -200,10 +213,9 @@ class ExportService:
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))
 
-    @staticmethod
-    def export_all_points_csv():
+    def export_all_points_csv(self):
         """Export measurement points for all subjects as CSV."""
-        all_subjects = Subject.query.all()
+        all_subjects = self.subject_repository.get_all_subjects()
 
         if len(all_subjects) == 0:
             return None
@@ -225,3 +237,4 @@ class ExportService:
 
         si.seek(0)
         return io.BytesIO(si.getvalue().encode("utf-8"))
+
