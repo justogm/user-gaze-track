@@ -5,11 +5,60 @@
     margin-top: 20px;
 }
 
+.plot-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .plot {
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 20px;
     min-height: 550px;
+}
+
+.download-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.download-buttons button {
+    padding: 8px 16px;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.download-buttons button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.download-buttons button:active {
+    transform: translateY(0);
+}
+
+.download-buttons button[onclick*="descargarAnimacion"] {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.download-buttons button[onclick*="descargarAnimacion"]:hover {
+    background-color: #218838;
+}
+
+.download-buttons button:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 h1 {

@@ -13,10 +13,36 @@
       href="{{ url_for('static', filename='css/visualizacion.css') }}"
 </head>
 <body>
-    <h1>Visualización de Sujeto</h1>
+    <header style="background-color: #f8f9fa; padding: 15px 30px; border-bottom: 2px solid #dee2e6; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">Visualización de Sujeto</h1>
+        <a href="/sujetos" class="btn btn-primary" style="font-size: 16px; padding: 10px 20px; text-decoration: none; background-color: #007bff; color: white; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+            </svg>
+            Volver a Sujetos
+        </a>
+    </header>
     <div id="plots">
-        <div id="mouse-plot" class="plot"></div>
-        <div id="gaze-plot" class="plot"></div>
+        <div class="plot-container">
+            <div id="mouse-plot" class="plot"></div>
+            <div class="download-buttons">
+                <button onclick="descargarGrafico('mouse-plot', 'png')">📥 PNG</button>
+                <button onclick="descargarGrafico('mouse-plot', 'svg')">📥 SVG</button>
+                <button onclick="descargarGrafico('mouse-plot', 'jpeg')">📥 JPEG</button>
+                <button onclick="descargarGrafico('mouse-plot', 'webp')">📥 WebP</button>
+                <button onclick="descargarAnimacion('mouse-plot', 'webm')" id="mouse-webm-btn">🎬 WebM</button>
+            </div>
+        </div>
+        <div class="plot-container">
+            <div id="gaze-plot" class="plot"></div>
+            <div class="download-buttons">
+                <button onclick="descargarGrafico('gaze-plot', 'png')">📥 PNG</button>
+                <button onclick="descargarGrafico('gaze-plot', 'svg')">📥 SVG</button>
+                <button onclick="descargarGrafico('gaze-plot', 'jpeg')">📥 JPEG</button>
+                <button onclick="descargarGrafico('gaze-plot', 'webp')">📥 WebP</button>
+                <button onclick="descargarAnimacion('gaze-plot', 'webm')" id="gaze-webm-btn">🎬 WebM</button>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/visualizacion.js') }}"></script>

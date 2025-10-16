@@ -34,9 +34,45 @@
         width: 100%;
         height: auto;
       }
+
+      #btn-volver {
+        position: fixed;
+        top: 20px;
+        left: -85px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 0 5px 5px 0;
+        text-decoration: none;
+        font-weight: 500;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+        transition: left 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+      }
+
+      #btn-volver:hover {
+        left: 0;
+        box-shadow: 2px 4px 12px rgba(0,0,0,0.3);
+      }
+
+      #btn-volver svg {
+        flex-shrink: 0;
+      }
     </style>
   </head>
   <body>
+    <a href="/sujetos" id="btn-volver">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Volver
+    </a>
+
     <div class="heatmap">
       <div style="height: 100%; width: 100%">
         <div class="iframe-container">
