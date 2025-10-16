@@ -3,7 +3,7 @@ Repository for Subject entity operations.
 """
 
 from typing import List, Optional
-from app.models import Subject
+from db.models import Subject
 from .base_repository import BaseRepository
 
 

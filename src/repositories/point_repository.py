@@ -3,7 +3,7 @@ Repository for Point entity operations.
 """
 
 from typing import List
-from app.models import Point
+from db.models import Point
 from .base_repository import BaseRepository
 
 

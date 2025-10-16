@@ -2,7 +2,7 @@
 Database manager for initialization and operations.
 """
 
-from app.models import db
+from .models import db
 
 
 class DatabaseManager:

@@ -11,9 +11,8 @@ from flask import (
     url_for,
 )
 from flasgger import Swagger
-from app.models import db, Subject, Measurement
+from db import DatabaseConfig, DatabaseManager, db, Subject, Measurement
 from api.routes import api_bp
-from db import DatabaseConfig, DatabaseManager
 from state import ConfigManager
 from repositories import SubjectRepository, MeasurementRepository
 
@@ -41,8 +40,8 @@ swagger_config = {
         {
             "endpoint": "apispec_1",
             "route": "/apispec_1.json",
-            "rule_filter": lambda rule: True,  # all in
-            "model_filter": lambda tag: True,  # all in
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
         }
     ],
     "static_url_path": "/flasgger_static",

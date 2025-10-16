@@ -3,7 +3,7 @@ Base repository class providing common database operations.
 """
 
 from typing import Type, TypeVar, Generic, List, Optional
-from app.models import db
+from db.models import db
 
 T = TypeVar('T')
 

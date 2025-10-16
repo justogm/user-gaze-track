@@ -4,7 +4,7 @@ Repository for TaskLog entity operations.
 
 from typing import List, Optional
 from datetime import datetime
-from app.models import TaskLog
+from db.models import TaskLog
 from .base_repository import BaseRepository
 
 

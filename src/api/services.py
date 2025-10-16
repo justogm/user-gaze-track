@@ -7,7 +7,7 @@ import csv
 import io
 from datetime import datetime
 import numpy as np
-from app.models import db, Subject, Point, Measurement, TaskLog
+from db import db, Subject, Point, Measurement, TaskLog
 from repositories import (
     SubjectRepository,
     MeasurementRepository,

@@ -4,7 +4,7 @@ Repository for Measurement entity operations.
 
 from typing import List, Optional
 from datetime import datetime
-from app.models import Measurement, Point
+from db.models import Measurement, Point
 from .base_repository import BaseRepository
 
 
@@ -65,3 +65,4 @@ class MeasurementRepository(BaseRepository[Measurement]):
             Number of measurements
         """
         return self.model.query.filter_by(subject_id=subject_id).count()
+
