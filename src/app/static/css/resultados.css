@@ -1,0 +1,52 @@
+/* Estilos para la página de resultados */
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heatmap {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #f0f0f0; /* Color de fondo para mayor visibilidad */
+}
+
+#img_interes {
+  width: 100%;
+  height: auto;
+}
+
+#btn-volver {
+  position: fixed;
+  top: 20px;
+  left: -85px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  text-decoration: none;
+  font-weight: 500;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  transition: left 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+#btn-volver:hover {
+  left: 0;
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#btn-volver svg {
+  flex-shrink: 0;
+}
