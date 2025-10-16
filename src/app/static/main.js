@@ -1,5 +1,5 @@
-var PointCalibrate = 0;
-var CalibrationPoints = {};
+// Initialize gaze tracker instance
+let gazeTracker = null;
 
 function showPrototype() {
   document.getElementById("figma-prototype").style.display = "block";
@@ -9,15 +9,21 @@ document.addEventListener("DOMContentLoaded", function () {
   var myModal = new bootstrap.Modal(document.getElementById("modal-ayuda"));
   myModal.show();
 
-  // Agrega un evento de clic a todos los elementos con la clase 'Calibration'.
-  document.querySelectorAll(".Calibration").forEach((i) => {
-    // Cuando se hace clic en un elemento con la clase 'Calibration', se llama a la función calPointClick
-    // pasando el elemento clicado como argumento.
-    i.addEventListener("click", () => {
-      calPointClick(i);
-    });
+  // Initialize gaze tracker
+  gazeTracker = new GazeTracker();
+
+  // Set up calibration
+  gazeTracker.setupCalibration();
+
+  // Set up calibration complete callback
+  gazeTracker.setOnCalibrationComplete(() => {
+    checkCalibrationAndShowButton();
   });
-  ShowCalibrationPoint();
+
+  // Set up points batch ready callback
+  gazeTracker.setOnPointsBatchReady((points) => {
+    enviarPuntos(points);
+  });
 
   // Manejar el clic en el botón "Entendido"
   document
@@ -27,142 +33,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-/**
- * Show the Calibration Points
- */
-function ShowCalibrationPoint() {
-  document.querySelectorAll(".Calibration").forEach((i) => {
-    i.style.removeProperty("display");
-  });
-  // initially hides the middle button
-  document.getElementById("Pt5").style.setProperty("display", "none");
-}
-
-var calibrated = false;
-
-function calPointClick(node) {
-  const id = node.id;
-
-  if (!CalibrationPoints[id]) {
-    // initialises if not done
-    CalibrationPoints[id] = 0;
-  }
-  CalibrationPoints[id]++; // increments values
-
-  if (CalibrationPoints[id] == 5) {
-    //only turn to yellow after 5 clicks
-    node.style.setProperty("background-color", "yellow");
-    node.setAttribute("disabled", "disabled");
-    PointCalibrate++;
-  } else if (CalibrationPoints[id] < 5) {
-    //Gradually increase the opacity of calibration points when click to give some indication to user.
-    var opacity = 0.2 * CalibrationPoints[id] + 0.2;
-    node.style.setProperty("opacity", opacity);
-  }
-
-  //Show the middle calibration point after all other points have been clicked.
-  if (PointCalibrate == 8) {
-    document.getElementById("Pt5").style.removeProperty("display");
-  }
-
-  if (PointCalibrate >= 9) {
-    // last point is calibrated
-    // grab every element in Calibration class and hide them except the middle point.
-    document.querySelectorAll(".Calibration").forEach((i) => {
-      i.style.setProperty("display", "none");
-    });
-
-    calibrated = true;
-
-    // Ocultar el video de la cámara inmediatamente después de la calibración
-    hideWebgazerVideo();
-
-    checkCalibrationAndShowButton();
-  }
-}
-
-/*
- * Sets store_points to true, so all the occuring prediction
- * points are stored
- */
-function store_points_variable() {
-  webgazer.params.storingPoints = true;
-}
-/*
- * Sets store_points to false, so prediction points aren't
- * stored any more
- */
-function stop_storing_points_variable() {
-  webgazer.params.storingPoints = false;
-}
-
-/*
- * Hide the webgazer video preview
- */
-function hideWebgazerVideo() {
-  // Ocultar el video preview
-  webgazer.showVideoPreview(false);
-  
-  // También ocultar manualmente cualquier elemento de video existente
-  const videos = document.querySelectorAll("#webgazerVideoContainer, #webgazerVideoFeed, video");
-  videos.forEach((video) => {
-    video.style.display = "none";
-  });
-}
-
 // -----------------------------
 window.onload = async function () {
-  //start the webgazer tracker
-  await webgazer
-    .setRegression("ridge") /* currently must set regression and tracker */
-    .setTracker("TFFacemesh")
-    .saveDataAcrossSessions(true)
-    .begin();
-  
-  // Configurar webgazer para ocultar el video desde el inicio
-  webgazer
-    .showVideoPreview(false) /* shows all video previews */
-    .showPredictionPoints(
-      false
-    ) /* shows a square every 100 milliseconds where current prediction is */
-    .applyKalmanFilter(
-      true
-    ) /* Kalman Filter defaults to on. Can be toggled by user. */;
-
-  // Asegurar que el video esté oculto después de la inicialización
-  setTimeout(() => {
-    hideWebgazerVideo();
-  }, 1000);
-
-  //Set up the webgazer video feedback.
-  // var setup = function () {
-  //   //Set up the main canvas. The main canvas is used to calibrate the webgazer.
-  //   var canvas = document.getElementById("plotting_canvas");
-  //   canvas.width = window.innerWidth;
-  //   canvas.height = window.innerHeight;
-  //   canvas.style.position = "fixed";
-  // };
-  // setup();
+  // Initialize the gaze tracker
+  if (gazeTracker) {
+    await gazeTracker.initialize();
+  }
 };
 
 // Set to true if you want to save the data even if you reload the page.
 window.saveDataAcrossSessions = true;
 
 window.onbeforeunload = function () {
-  webgazer.end();
+  if (gazeTracker) {
+    gazeTracker.end();
+  }
 };
 
 /**
  * Restart the calibration process by clearing the local storage and reseting the calibration point
  */
 function Restart() {
-  webgazer.clearData();
-  ClearCalibration();
-  PopUpInstruction();
+  if (gazeTracker) {
+    gazeTracker.restart();
+  }
 }
 
 function isCalibrated() {
-  return calibrated;
+  return gazeTracker ? gazeTracker.isCalibrated() : false;
 }
 
 /**
@@ -227,71 +125,6 @@ function enviarPuntos(puntos) {
       console.error("Error:", error);
     });
 }
-
-let points = [];
-let mouse_position = { x: 0, y: 0 }; // Define mouse_position as an object
-
-document.addEventListener("mousemove", (event) => {
-  if (isCalibrated()) {
-    mouse_position.x = event.clientX;
-    mouse_position.y = event.clientY;
-  }
-});
-
-// Inicia WebGazer.js y establece el GazeListener
-document.addEventListener("DOMContentLoaded", function () {
-  const observer = new MutationObserver(() => {
-    // Ocultar el video siempre, no solo cuando esté calibrado
-    const videos = document.querySelectorAll("#webgazerVideoContainer, #webgazerVideoFeed, video");
-    videos.forEach((video) => {
-      if (isCalibrated()) {
-        video.style.display = "none";
-      }
-    });
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  webgazer
-    .setGazeListener(function (data, elapsedTime) {
-      if (data == null) {
-        return;
-      }
-      webgazer.util.bound(data);
-
-      const taskBar = document.getElementById("task-bar");
-
-      if (isCalibrated() && taskBar.style.display !== "block") {
-        var xprediction = data.x; // Coordenadas x relativas al viewport
-        var yprediction = data.y; // Coordenadas y relativas al viewport
-
-        // Add the current timestamp to each point
-        const currentTimestamp = new Date().toLocaleString("en-US", {
-          timeZone: "America/Argentina/Buenos_Aires",
-        });
-
-        points.push({
-          date: currentTimestamp, // Add the timestamp here
-          gaze: {
-            x: xprediction,
-            y: yprediction,
-          },
-          mouse: {
-            x: mouse_position.x,
-            y: mouse_position.y,
-          },
-        });
-
-        if (points.length == 20) {
-          console.log("Enviando puntos...");
-          console.log(points);
-          enviarPuntos(points);
-          points = [];
-        }
-      }
-    })
-    .begin();
-});
 
 function enviarTaskLogIndividual(taskLog) {
   fetch("/api/save-tasklogs", {
@@ -452,7 +285,7 @@ function showNextTaskInBar() {
 }
 
 function checkCalibrationAndShowButton() {
-  if (calibrated) {
+  if (isCalibrated()) {
     const toggleBar = document.getElementById("toggle-bar");
     toggleBar.style.display = "block";
 
