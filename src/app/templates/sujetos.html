@@ -5,43 +5,143 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/sujetos.css') }}">
     <title>Lista de Sujetos</title>
 </head>
 <body>
-	<div style="text-align: center;">
-		<h1>Lista de Sujetos</h1>
-		<table style="margin: 0 auto; border-collapse: collapse; width: 50%;", class="table table-hover">
-			<thead>
-				<tr>
-					<th scope="col", style="border: 1px solid black; padding: 8px;">ID</th>
-					<th scope="col", style="border: 1px solid black; padding: 8px;">Nombre</th>
-					<th scope="col", style="border: 1px solid black; padding: 8px;">Edad</th>
-					<th scope="col", style="border: 1px solid black; padding: 8px;">Resultados</th>
-					<th scope="col", style="border: 1px solid black; padding: 8px;">Visualización</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for sujeto in sujetos %}
-					<tr>
-						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.id }}</td>
-						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.name }} {{ sujeto.surname }}</td>
-						<td style="border: 1px solid black; padding: 8px;">{{ sujeto.age }} años</td>
-						<td style="border: 1px solid black; padding: 8px;">
-							<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-link">Ver Resultados</a>
-						</td>
-						<td style="border: 1px solid black; padding: 8px;">
-							<a href="{{ url_for('visualizacion', id=sujeto.id) }}" class="btn btn-link">Ver Animaciones</a>
-						</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+	<div class="container mt-4">
+		<h1 class="text-center mb-4">Lista de Sujetos por Estudio</h1>
+		
+		<ul class="nav nav-tabs" id="studyTabs" role="tablist">
+			{% for data in studies_data|reverse %}
+			<li class="nav-item" role="presentation">
+				<button class="nav-link {% if loop.first %}active{% endif %}" 
+						id="study-{{ data.study.id }}-tab" 
+						data-bs-toggle="tab" 
+						data-bs-target="#study-{{ data.study.id }}" 
+						type="button" 
+						role="tab">
+					{{ data.study.name }}
+				</button>
+			</li>
+			{% endfor %}
+			{% if subjects_without_study %}
+			<li class="nav-item" role="presentation">
+				<button class="nav-link {% if not studies_data %}active{% endif %}" 
+						id="no-study-tab" 
+						data-bs-toggle="tab" 
+						data-bs-target="#no-study" 
+						type="button" 
+						role="tab">
+					Sin Estudio
+				</button>
+			</li>
+			{% endif %}
+		</ul>
+
+		<div class="tab-content" id="studyTabsContent">
+			{% for data in studies_data|reverse %}
+			<div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+				 id="study-{{ data.study.id }}" 
+				 role="tabpanel">
+				
+				<div class="study-info">
+					<h5>{{ data.study.name }}</h5>
+					{% if data.study.description %}
+					<p><strong>Descripción:</strong> {{ data.study.description }}</p>
+					{% endif %}
+					{% if data.study.prototype_url %}
+					<p><strong>Prototipo URL:</strong> <a href="{{ data.study.prototype_url }}" target="_blank">{{ data.study.prototype_url }}</a></p>
+					{% endif %}
+					{% if data.study.prototype_image_path %}
+					<p><strong>Imagen:</strong> {{ data.study.prototype_image_path }}</p>
+					{% endif %}
+					<p><strong>Creado:</strong> {{ data.study.created_at.strftime('%Y-%m-%d %H:%M') if data.study.created_at else 'N/A' }}</p>
+					<p><strong>Participantes:</strong> {{ data.subjects|length }}</p>
+				</div>
+
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">Nombre</th>
+							<th scope="col">Edad</th>
+							<th scope="col">Resultados</th>
+							<th scope="col">Visualización</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for sujeto in data.subjects %}
+						<tr>
+							<td>{{ sujeto.id }}</td>
+							<td>{{ sujeto.name }} {{ sujeto.surname }}</td>
+							<td>{{ sujeto.age }} años</td>
+							<td>
+								<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-sm btn-link">Ver Resultados</a>
+							</td>
+							<td>
+								<a href="{{ url_for('visualizacion', id=sujeto.id) }}" class="btn btn-sm btn-link">Ver Animaciones</a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			{% endfor %}
+
+			{% if subjects_without_study %}
+			<div class="tab-pane fade {% if not studies_data %}show active{% endif %}" 
+				 id="no-study" 
+				 role="tabpanel">
+				
+				<div class="study-info">
+					<h5>Sujetos sin Estudio Asignado</h5>
+					<p>Estos sujetos fueron creados antes de implementar el sistema de estudios.</p>
+					<p><strong>Participantes:</strong> {{ subjects_without_study|length }}</p>
+				</div>
+
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th scope="col">ID</th>
+							<th scope="col">Nombre</th>
+							<th scope="col">Edad</th>
+							<th scope="col">Resultados</th>
+							<th scope="col">Visualización</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for sujeto in subjects_without_study %}
+						<tr>
+							<td>{{ sujeto.id }}</td>
+							<td>{{ sujeto.name }} {{ sujeto.surname }}</td>
+							<td>{{ sujeto.age }} años</td>
+							<td>
+								<a href="{{ url_for('resultados', id=sujeto.id) }}" class="btn btn-sm btn-link">Ver Resultados</a>
+							</td>
+							<td>
+								<a href="{{ url_for('visualizacion', id=sujeto.id) }}" class="btn btn-sm btn-link">Ver Animaciones</a>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			{% endif %}
+		</div>
+
+		<div class="text-center mt-4">
+			<button id="btn-descarga" type="button" class="btn btn-outline-primary" onclick="descargarArchivo()">
+				Descargar Todos los Datos
+			</button>
+		</div>
 	</div>
-	<button id="btn-descarga" type="button" class="btn btn-outline-primary" onclick="descargarArchivo()">Descargar</button>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript">
+		function descargarArchivo() {
+			window.location.href = '/api/download-all';
+		}
+	</script>
 </body>
-<script type="text/javascript">
-	function descargarArchivo() {
-		window.location.href = '/api/download-all';
-	}
-</script>
 </html>

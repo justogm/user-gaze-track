@@ -13,7 +13,7 @@ class SubjectRepository(BaseRepository[Subject]):
     def __init__(self):
         super().__init__(Subject)
     
-    def create_subject(self, name: str, surname: str, age: int) -> Subject:
+    def create_subject(self, name: str, surname: str, age: int, study_id: Optional[int] = None) -> Subject:
         """
         Create a new subject.
         
@@ -21,11 +21,12 @@ class SubjectRepository(BaseRepository[Subject]):
             name: Subject's name
             surname: Subject's surname
             age: Subject's age
+            study_id: Optional ID of the study this subject belongs to
             
         Returns:
             The created Subject instance
         """
-        subject = Subject(name=name, surname=surname, age=age)
+        subject = Subject(name=name, surname=surname, age=age, study_id=study_id)
         self.add(subject)
         return subject
     
